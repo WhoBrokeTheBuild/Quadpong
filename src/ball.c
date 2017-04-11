@@ -4,9 +4,11 @@
 void ball_init(ball_t * ball)
 {
     ball->sprite = (sprite_t *)malloc(sizeof(sprite_t));
-    sprite_load(ball->sprite, PIXEL_ASSET_PATH);
+    sprite_init(ball->sprite, PIXEL_ASSET_PATH);
 
-    int angle = rand() % 360;
+    ball->last_hit = -1;
+
+    int angle = RAD(rand() % 360);
     ball->vel.x = cosf(angle) * 5.0f;
     ball->vel.y = sinf(angle) * 5.0f;
 
@@ -16,12 +18,16 @@ void ball_init(ball_t * ball)
     sprite_set_size(ball->sprite, size);
 }
 
+void ball_cleanup(ball_t * ball)
+{
+    sprite_cleanup(ball->sprite);
+}
+
 void ball_update(ball_t * ball, struct player ** players)
 {
     vec2_t pos = sprite_get_pos(ball->sprite);
     pos.x += ball->vel.x;
     pos.y += ball->vel.y;
-    sprite_set_pos(ball->sprite, pos);
 
     int p_left = -1,
         p_right = -1,
@@ -30,10 +36,15 @@ void ball_update(ball_t * ball, struct player ** players)
 
     for (int i = 0; i < MAX_PLAYERS; ++i)
     {
+        if (NULL == players[i]) break;
+
         if (SDL_HasIntersection(&(ball->sprite->dst_rect), &(players[i]->sprite->dst_rect)))
         {
+            ball->last_hit = i;
             ball->color = players[i]->color;
             SDL_SetTextureColorMod(ball->sprite->texture, ball->color.r, ball->color.g, ball->color.b);
+
+
 
             if (AREA_LEFT == players[i]->area || AREA_RIGHT == players[i]->area)
             {
@@ -45,72 +56,72 @@ void ball_update(ball_t * ball, struct player ** players)
             }
         }
 
-        if (AREA_LEFT == players[i]->area)
+        switch (players[i]->area)
         {
-            p_left = i;
-        }
-        else if (AREA_RIGHT == players[i]->area)
-        {
-            p_right = i;
-        }
-        else if (AREA_TOP == players[i]->area)
-        {
-            p_top = i;
-        }
-        else if (AREA_BOTTOM == players[i]->area)
-        {
-            p_bot = i;
+        case AREA_LEFT:     p_left = i;  break;
+        case AREA_RIGHT:    p_right = i; break;
+        case AREA_TOP:      p_top = i;   break;
+        case AREA_BOTTOM:   p_bot = i;   break;
         }
     }
 
-    if (0 > pos.x)
+    if (0 >= pos.x)
     {
-        if (0 >= p_left)
+        if (-1 != p_left)
         {
-            printf("Player %d loses", p_left);
+            printf("Player %d loses\n", p_left);
             exit(0); // TODO: Improve
         }
         else
         {
+            printf("Bounce left\n");
             ball->vel.x = -ball->vel.x;
         }
     }
-    else if (0 > pos.y)
+    else if (0 >= pos.y)
     {
-        if (0 >= p_top)
+        if (-1 != p_top)
         {
-            printf("Player %d loses", p_top);
+            printf("Player %d loses\n", p_top);
             exit(0); // TODO: Improve
         }
         else
         {
+            printf("Bounce top\n");
             ball->vel.y = -ball->vel.y;
         }
     }
-    else if (WIN_WIDTH < pos.x)
+    else if (WIN_WIDTH <= pos.x)
     {
-        if (0 >= p_right)
+        if (-1 != p_right)
         {
-            printf("Player %d loses", p_right);
+            printf("Player %d loses\n", p_right);
             exit(0); // TODO: Improve
         }
         else
         {
+            printf("Bounce right\n");
             ball->vel.x = -ball->vel.x;
         }
     }
-    else if (WIN_HEIGHT < pos.y)
+    else if (WIN_HEIGHT <= pos.y)
     {
-        if (0 >= p_bot)
+        if (-1 != p_bot)
         {
-            printf("Player %d loses", p_bot);
+            printf("Player %d loses\n", p_bot);
             exit(0); // TODO: Improve
         }
         else
         {
+            printf("Bounce bottom\n");
             ball->vel.y = -ball->vel.y;
         }
     }
+
+    pos = sprite_get_pos(ball->sprite);
+    pos.x += ball->vel.x;
+    pos.y += ball->vel.y;
+    sprite_set_pos(ball->sprite, pos);
 }
 
 void ball_render(ball_t * ball)

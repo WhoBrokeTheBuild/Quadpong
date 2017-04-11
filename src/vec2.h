@@ -10,4 +10,11 @@ typedef struct vec2
 }
 vec2_t;
 
+typedef struct vec2f
+{
+    float x;
+    float y;
+}
+vec2f_t;
+
 #endif // QUAPONG_VEC2_H

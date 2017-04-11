@@ -1,18 +1,19 @@
 #include "quapong.h"
-#include "sprite.h"
-#include "ball.h"
-#include "player.h"
 #include "util.h"
+#include "scene.h"
 
 SDL_Window      * g_window = NULL;
 SDL_Renderer    * g_renderer = NULL;
 
+TTF_Font * g_fnt_large = NULL;
+TTF_Font * g_fnt_small = NULL;
+
+bool g_running = true;
+
 int main(int argc, char ** argv)
 {
     int             retval = 0;
-    ball_t          ball;
-    player_t *      players[MAX_PLAYERS];
-    //wall_t *        walls[4]; // TODO: Something?
+    menu_scene_t    menu_scene;
 
     srand(time(0));
 
@@ -39,25 +40,28 @@ int main(int argc, char ** argv)
         goto error_sdl;
     }
 
-    ball_init(&ball);
+    if (-1 == TTF_Init())
+    {
+        fprintf(stderr, "TTF_Init failed: %s\n", TTF_GetError());
+        retval = 1;
+        goto error_sdl;
+    }
 
-    memset(players, 0, sizeof(player_t *) * MAX_PLAYERS);
-    
-    players[0] = (player_t *)malloc(sizeof(local_player_t));
-    local_player_init((local_player_t *)players[0], AREA_LEFT, SDLK_DOWN, SDLK_UP);
+    g_fnt_large = TTF_OpenFont(FONT_ASSET_PATH, FONT_LARGE_SIZE);
+    g_fnt_small = TTF_OpenFont(FONT_ASSET_PATH, FONT_SMALL_SIZE);
+    if (NULL == g_fnt_large || NULL == g_fnt_small)
+    {
+        fprintf(stderr, "TTF_OpenFont failed: %s\n", TTF_GetError());
+        retval = 1;
+        goto error_assets;
+    }
 
-    players[1] = (player_t *)malloc(sizeof(local_player_t));
-    local_player_init((local_player_t *)players[1], AREA_RIGHT, SDLK_s, SDLK_w);
-    
-    players[2] = (player_t *)malloc(sizeof(local_player_t));
-    local_player_init((local_player_t *)players[2], AREA_TOP, SDLK_RIGHT, SDLK_LEFT);
-
-    players[3] = (player_t *)malloc(sizeof(local_player_t));
-    local_player_init((local_player_t *)players[3], AREA_BOTTOM, SDLK_d, SDLK_a);
-    
+    menu_scene_init(&menu_scene);
+    g_cur_scene = (scene_t *)&menu_scene;
+ 
     SDL_Event ev;
 
-    for (;;)
+    while (g_running)
     {
         SDL_PollEvent(&ev);
         if (SDL_QUIT == ev.type)
@@ -68,23 +72,15 @@ int main(int argc, char ** argv)
         SDL_SetRenderDrawColor(g_renderer, 0x00, 0x00, 0x00, 0xFF);
         SDL_RenderClear(g_renderer);
         
-        for (int i = 0; i < MAX_PLAYERS; ++i)
+        if (NULL != g_cur_scene)
         {
-            if (NULL != players[i])
-            {
-                if (players[i]->update)
-                {
-                    players[i]->update(players[i], &ev);
-                }
-                if (players[i]->render)
-                {
-                    players[i]->render(players[i]);
-                }
-            }
+            g_cur_scene->update(g_cur_scene, &ev);
         }
 
-        ball_update(&ball, players);
-        ball_render(&ball);
+        if (NULL != g_cur_scene)
+        {
+            g_cur_scene->render(g_cur_scene);
+        }
     
         SDL_RenderPresent(g_renderer);
 
@@ -92,21 +88,17 @@ int main(int argc, char ** argv)
         SDL_Delay(16);
     }
 
+    ((scene_t *)(&menu_scene))->cleanup((scene_t *)&menu_scene);
+
 error_assets:
 
-    for (int i = 0; i < MAX_PLAYERS; ++i)
-    {
-        if (players[i])
-        {
-            if (players[i]->cleanup)
-            {
-                players[i]->cleanup(players[i]);
-            }
-            free(players[i]);
-        }
-    }
+    TTF_CloseFont(g_fnt_large);
+    TTF_CloseFont(g_fnt_small);
+
 
 error_sdl:
+
+    TTF_Quit();
 
     IMG_Quit();
     

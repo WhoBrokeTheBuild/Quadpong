@@ -8,14 +8,17 @@
 typedef struct ball
 {
     sprite_t * sprite;
+    int last_hit;
     SDL_Color color;
-    vec2_t vel;
+    vec2f_t pos;
+    vec2f_t vel;
 }
 ball_t;
 
 struct player;
 
 void ball_init(ball_t * ball);
+void ball_cleanup(ball_t * ball);
 
 void ball_update(ball_t * ball, struct player ** players);
 void ball_render(ball_t * ball);

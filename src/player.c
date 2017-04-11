@@ -17,11 +17,12 @@ void player_init(player_t * ply, area_t area)
     ply->cleanup = &player_cleanup_cb;
     ply->update = NULL;
     ply->render = &player_render_cb;
+    ply->score = 0;
     ply->area = area;
     ply->movement = 50;
 
     ply->sprite = (sprite_t *)malloc(sizeof(sprite_t));
-    sprite_load(ply->sprite, PIXEL_ASSET_PATH);
+    sprite_init(ply->sprite, PIXEL_ASSET_PATH);
 
     if (AREA_LEFT == ply->area || AREA_RIGHT == ply->area)
     {
@@ -45,7 +46,7 @@ void player_cleanup_cb(player_t * ply)
 {
     assert(NULL != ply);
 
-    sprite_free(ply->sprite);
+    sprite_cleanup(ply->sprite);
     free(ply->sprite);
 }
 

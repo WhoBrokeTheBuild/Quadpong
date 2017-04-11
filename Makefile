@@ -1,11 +1,11 @@
 
-CFLAGS  += -g -Wall -std=c11
+CFLAGS  += -g -Wall -std=c11 -D_XOPEN_SOURCE=700
 LDFLAGS +=
-LDLIBS  +=
+LDLIBS  += -lpng -lz -lm
 
 ## SDL2
 CFLAGS  += $(shell sdl2-config --cflags)
-LDLIBS  += $(shell sdl2-config --libs) -lSDL2_image -lpng -lz -lm
+LDLIBS  += $(shell sdl2-config --libs) -lSDL2_image -lSDL2_ttf
 
 SRC_DIR = src
 BIN_DIR = bin

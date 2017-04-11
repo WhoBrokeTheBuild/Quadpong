@@ -24,6 +24,7 @@ typedef struct player
     SDL_Color color;
     int movement;
     area_t area;
+    int score;
 }
 player_t;
 
