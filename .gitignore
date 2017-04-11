@@ -1,0 +1,6 @@
+
+bin
+obj
+.dep
+*.o
+.vgcore*

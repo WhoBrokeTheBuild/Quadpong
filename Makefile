@@ -1,0 +1,39 @@
+
+CFLAGS  += -g -Wall -std=c11
+LDFLAGS +=
+LDLIBS  +=
+
+## SDL2
+CFLAGS  += $(shell sdl2-config --cflags)
+LDLIBS  += $(shell sdl2-config --libs) -lSDL2_image -lpng -lz -lm
+
+SRC_DIR = src
+BIN_DIR = bin
+OBJ_DIR = obj
+DEP_DIR = .dep
+
+SRC = $(wildcard $(SRC_DIR)/*.c)
+OBJ = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
+OUT = $(BIN_DIR)/quapong
+
+$(shell mkdir -p $(SRC_DIR) $(BIN_DIR) $(OBJ_DIR) $(DEP_DIR))
+
+all: $(OUT)
+
+clean:
+	rm $(OBJ) $(OUT)
+
+run:
+	@$(OUT)
+
+$(OUT): $(OBJ)
+	$(CC) $(LDFLAGS) -o $@ $(LDLIBS) $^
+
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c $(DEP_DIR)/%.d
+	$(CC) $(CFLAGS) -MM -MP -MT $@ -o $(DEP_DIR)/$*.d $<
+	$(CC) $(CFLAGS) -c -o $@ $< 
+
+$(DEP_DIR)/%.d: ;
+.PRECIOUS: $(DEP_DIR)/%.d
+-include $(patsubst $(SRC_DIR)/%.c, $(DEP_DIR)/%.d, $(SRC))
