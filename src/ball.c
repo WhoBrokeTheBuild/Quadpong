@@ -19,6 +19,9 @@ void ball_init(ball_t * ball)
 void ball_update(ball_t * ball, struct player ** players)
 {
     vec2_t pos = sprite_get_pos(ball->sprite);
+    pos.x += ball->vel.x;
+    pos.y += ball->vel.y;
+    sprite_set_pos(ball->sprite, pos);
 
     int p_left = -1,
         p_right = -1,
@@ -29,6 +32,9 @@ void ball_update(ball_t * ball, struct player ** players)
     {
         if (SDL_HasIntersection(&(ball->sprite->dst_rect), &(players[i]->sprite->dst_rect)))
         {
+            ball->color = players[i]->color;
+            SDL_SetTextureColorMod(ball->sprite->texture, ball->color.r, ball->color.g, ball->color.b);
+
             if (AREA_LEFT == players[i]->area || AREA_RIGHT == players[i]->area)
             {
                 ball->vel.x = -ball->vel.x;
@@ -37,8 +43,6 @@ void ball_update(ball_t * ball, struct player ** players)
             {
                 ball->vel.y = -ball->vel.y;
             }
-
-            break;
         }
 
         if (AREA_LEFT == players[i]->area)
@@ -107,10 +111,6 @@ void ball_update(ball_t * ball, struct player ** players)
             ball->vel.y = -ball->vel.y;
         }
     }
-
-    pos.x += ball->vel.x;
-    pos.y += ball->vel.y;
-    sprite_set_pos(ball->sprite, pos);
 }
 
 void ball_render(ball_t * ball)

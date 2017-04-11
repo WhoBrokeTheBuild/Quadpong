@@ -34,6 +34,7 @@ void player_init(player_t * ply, area_t area)
         sprite_set_size(ply->sprite, size);
     }
 
+    ply->color = player_colors[player_ind];
     SDL_SetTextureColorMod(ply->sprite->texture, 
             player_colors[player_ind].r,
             player_colors[player_ind].g,
