@@ -1,7 +1,7 @@
-#ifndef QUAPONG_GAME_SCENE_H
-#define QUAPONG_GAME_SCENE_H
+#ifndef QUADPONG_GAME_SCENE_H
+#define QUADPONG_GAME_SCENE_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "scene.h"
 #include "sprite.h"
 
@@ -50,4 +50,4 @@ void game_scene_stop_cb(scene_t * scn);
 void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt);
 void game_scene_render_cb(scene_t * scn);
 
-#endif // QUAPONG_GAME_SCENE_H
+#endif // QUADPONG_GAME_SCENE_H

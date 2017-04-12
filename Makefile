@@ -22,7 +22,7 @@ DEP_DIR = .dep
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
-OUT = $(BIN_DIR)/quapong
+OUT = $(BIN_DIR)/quadpong
 
 $(shell mkdir -p $(SRC_DIR) $(BIN_DIR) $(OBJ_DIR) $(DEP_DIR))
 

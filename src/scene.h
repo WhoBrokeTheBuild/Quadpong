@@ -1,7 +1,7 @@
-#ifndef QUAPONG_SCENE_H
-#define QUAPONG_SCENE_H
+#ifndef QUADPONG_SCENE_H
+#define QUADPONG_SCENE_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "game_time.h"
 #include "vec2.h"
 
@@ -25,4 +25,4 @@ void scene_pop();
 
 extern scene_t * g_cur_scene;
 
-#endif // QUAPONG_SCENE_H
+#endif // QUADPONG_SCENE_H

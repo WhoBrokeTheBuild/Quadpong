@@ -1,7 +1,7 @@
-#ifndef QUAPONG_GAME_TIME_H
-#define QUAPONG_GAME_TIME_H
+#ifndef QUADPONG_GAME_TIME_H
+#define QUADPONG_GAME_TIME_H
 
-#include "quapong.h"
+#include "quadpong.h"
 
 typedef struct game_time
 {
@@ -12,4 +12,4 @@ typedef struct game_time
 }
 game_time_t;
 
-#endif // QUAPONG_GAME_TIME_H
+#endif // QUADPONG_GAME_TIME_H

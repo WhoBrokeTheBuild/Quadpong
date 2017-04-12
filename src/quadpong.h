@@ -1,5 +1,5 @@
-#ifndef QUAPONG_H
-#define QUAPONG_H
+#ifndef QUADPONG_H
+#define QUADPONG_H
 
 #define _MATH_DEFINES_DEFINED 
 
@@ -28,6 +28,7 @@ extern bool g_cap_fps;
 extern bool g_show_fps;
 extern int g_max_fps;
 
+#define GAME_TITLE          "Quadpong"
 
 #define WIN_WIDTH           (700)
 #define WIN_HEIGHT          (700 + 20)
@@ -53,4 +54,4 @@ extern int g_max_fps;
 #define TITLE_ASSET_PATH    ASSET_PATH "title.png"
 #define FONT_ASSET_PATH     ASSET_PATH "roboto.ttf"
 
-#endif // QUAPONG_H
+#endif // QUADPONG_H

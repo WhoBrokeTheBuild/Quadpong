@@ -1,4 +1,4 @@
-#include "quapong.h"
+#include "quadpong.h"
 #include "util.h"
 #include "menu_scene.h"
 #include "game_time.h"
@@ -35,7 +35,7 @@ int main(int argc, char ** argv)
         goto error_sdl;
     }
 
-    SDL_SetWindowTitle(g_window, "Quapong");
+    SDL_SetWindowTitle(g_window, GAME_TITLE);
 
     if (0 == (IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
     {
@@ -135,7 +135,7 @@ int main(int argc, char ** argv)
                 sprite_text_set_text(&fps_disp, fps_buffer);
             }
             
-            snprintf(title_buffer, sizeof(title_buffer), "Quapong - %.2f", gt.fps);
+            snprintf(title_buffer, sizeof(title_buffer), GAME_TITLE " - %.2f", gt.fps);
             SDL_SetWindowTitle(g_window, title_buffer);
         }
 

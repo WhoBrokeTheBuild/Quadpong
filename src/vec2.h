@@ -1,7 +1,7 @@
-#ifndef QUAPONG_VEC2_H
-#define QUAPONG_VEC2_H
+#ifndef QUADPONG_VEC2_H
+#define QUADPONG_VEC2_H
 
-#include "quapong.h"
+#include "quadpong.h"
 
 typedef struct vec2
 {
@@ -17,4 +17,4 @@ typedef struct vec2f
 }
 vec2f_t;
 
-#endif // QUAPONG_VEC2_H
+#endif // QUADPONG_VEC2_H

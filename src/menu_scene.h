@@ -1,7 +1,7 @@
-#ifndef QUAPONG_MENU_SCENE_H
-#define QUAPONG_MENU_SCENE_H
+#ifndef QUADPONG_MENU_SCENE_H
+#define QUADPONG_MENU_SCENE_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "scene.h"
 #include "sprite.h"
 
@@ -48,4 +48,4 @@ void menu_scene_stop_cb(scene_t * scn);
 void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt);
 void menu_scene_render_cb(scene_t * scn);
 
-#endif // QUAPONG_MENU_SCENE_H
+#endif // QUADPONG_MENU_SCENE_H

@@ -1,7 +1,7 @@
-#ifndef QUAPONG_BALL_H
-#define QUAPONG_BALL_H
+#ifndef QUADPONG_BALL_H
+#define QUADPONG_BALL_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "game_time.h"
 #include "sprite.h"
 #include "vec2.h"
@@ -23,4 +23,4 @@ void ball_cleanup(ball_t * ball);
 void ball_update(ball_t * ball, struct player ** players, game_time_t * gt);
 void ball_render(ball_t * ball);
 
-#endif // QUAPONG_BALL_H
+#endif // QUADPONG_BALL_H

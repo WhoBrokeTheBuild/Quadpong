@@ -1,7 +1,7 @@
-#ifndef QUAPONG_PLAYER_H
-#define QUAPONG_PLAYER_H
+#ifndef QUADPONG_PLAYER_H
+#define QUADPONG_PLAYER_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "game_time.h"
 #include "sprite.h"
 #include "vec2.h"
@@ -58,4 +58,4 @@ void network_player_init(network_player_t * ply, area_t area, SDL_Color color, i
 void network_player_cleanup_cb(player_t * ply);
 void network_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt);
 
-#endif // QUAPONG_PLAYER_H
+#endif // QUADPONG_PLAYER_H

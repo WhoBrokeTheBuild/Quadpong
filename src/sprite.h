@@ -1,7 +1,7 @@
-#ifndef QUAPONG_SPRITE_H
-#define QUAPONG_SPRITE_H
+#ifndef QUADPONG_SPRITE_H
+#define QUADPONG_SPRITE_H
 
-#include "quapong.h"
+#include "quadpong.h"
 #include "util.h"
 #include "vec2.h"
 
@@ -85,4 +85,4 @@ static inline void sprite_text_set_pos(sprite_text_t * spr, vec2f_t pos)
 }
 
 
-#endif // QUAPONG_SPRITE_H
+#endif // QUADPONG_SPRITE_H
