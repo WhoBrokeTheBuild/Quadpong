@@ -41,7 +41,7 @@ typedef struct menu_scene
 }
 menu_scene_t;
 
-void menu_scene_init(menu_scene_t * scn);
+void menu_scene_init(menu_scene_t * mscn);
 void menu_scene_cleanup_cb(scene_t * scn);
 void menu_scene_start_cb(scene_t * scn);
 void menu_scene_stop_cb(scene_t * scn);

@@ -42,84 +42,84 @@ menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * tex
     return &opt->options[opt->num_options - 1];
 }
 
-void option_quit_cb(menu_scene_t * scn)
+void option_quit_cb(menu_scene_t * mscn)
 {
     g_running = false;
 }
 
-void option_local_game_cb(menu_scene_t * scn)
+void option_local_game_cb(menu_scene_t * mscn)
 {
-    scn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
-    game_scene_init_local(scn->game_scene, 2);
+    mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
+    game_scene_init_local(mscn->game_scene, 2);
 
-    scene_push((scene_t *)scn->game_scene);
+    scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_host_two_game_cb(menu_scene_t * scn)
+void option_host_two_game_cb(menu_scene_t * mscn)
 {
-    scn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
-    game_scene_init_host(scn->game_scene, 2);
+    mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
+    game_scene_init_host(mscn->game_scene, 2);
 
-    scene_push((scene_t *)scn->game_scene);
+    scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_host_four_game_cb(menu_scene_t * scn)
+void option_host_four_game_cb(menu_scene_t * mscn)
 {
-    scn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
-    game_scene_init_host(scn->game_scene, 4);
+    mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
+    game_scene_init_host(mscn->game_scene, 4);
 
-    scene_push((scene_t *)scn->game_scene);
+    scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_connect_game_cb(menu_scene_t * scn)
+void option_connect_game_cb(menu_scene_t * mscn)
 {
-    scn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
-    game_scene_init_connect(scn->game_scene, "127.0.0.1");
+    mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
+    game_scene_init_connect(mscn->game_scene, "127.0.0.1");
 
-    scene_push((scene_t *)scn->game_scene);
+    scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_toggle_cap_fps_cb(menu_scene_t * scn)
+void option_toggle_cap_fps_cb(menu_scene_t * mscn)
 {
     g_cap_fps = !g_cap_fps;
 }
 
-void option_toggle_show_fps_cb(menu_scene_t * scn)
+void option_toggle_show_fps_cb(menu_scene_t * mscn)
 {
     g_show_fps = !g_show_fps;
 }
 
-void menu_scene_init(menu_scene_t * scn)
+void menu_scene_init(menu_scene_t * mscn)
 {
-    assert(NULL != scn);
+    assert(NULL != mscn);
 
-    scene_t * base = (scene_t *)scn;
-    scene_init(base);
+    scene_t * scn = (scene_t *)mscn;
+    scene_init(scn);
 
-    base->start = &menu_scene_start_cb;
-    base->stop = &menu_scene_stop_cb;
-    base->cleanup = &menu_scene_cleanup_cb;
-    base->update = &menu_scene_update_cb;
-    base->render = &menu_scene_render_cb;
+    scn->start = &menu_scene_start_cb;
+    scn->stop = &menu_scene_stop_cb;
+    scn->cleanup = &menu_scene_cleanup_cb;
+    scn->update = &menu_scene_update_cb;
+    scn->render = &menu_scene_render_cb;
 
-    scn->game_scene = NULL;
+    mscn->game_scene = NULL;
 
     vec2f_t title_pos = { 50, 50 };
-    sprite_init(&scn->title, TITLE_ASSET_PATH);
-    sprite_set_pos(&scn->title, title_pos);
+    sprite_init(&mscn->title, TITLE_ASSET_PATH);
+    sprite_set_pos(&mscn->title, title_pos);
 
     vec2_t arrow_size = { 20, 20 };
-    sprite_init(&scn->arrow, PIXEL_ASSET_PATH);
-    sprite_set_size(&scn->arrow, arrow_size);
+    sprite_init(&mscn->arrow, PIXEL_ASSET_PATH);
+    sprite_set_size(&mscn->arrow, arrow_size);
 
     menu_option_t * menu_ptr;
     vec2f_t root_mpos = { 50, 150 };
-    menu_option_init(&scn->root_option_group, NULL, NULL, root_mpos);
+    menu_option_init(&mscn->root_option_group, NULL, NULL, root_mpos);
 
-    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Local Game", &option_local_game_cb, root_mpos);
+    menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Local Game", &option_local_game_cb, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
-    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Host Game", NULL, root_mpos);
+    menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Host Game", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
     vec2f_t host_mpos = { 50, 150 };
@@ -127,10 +127,10 @@ void menu_scene_init(menu_scene_t * scn)
     host_mpos.y += MENU_OPTION_HEIGHT;
     menu_option_add_sub_option(menu_ptr, "Four Player", &option_host_four_game_cb, host_mpos);
 
-    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Connect to Game", NULL, root_mpos);
+    menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Connect to Game", &option_connect_game_cb, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
     
-    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Options", NULL, root_mpos);
+    menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Options", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
     vec2f_t opt_mpos = { 50, 150 };
@@ -138,7 +138,7 @@ void menu_scene_init(menu_scene_t * scn)
     opt_mpos.y += MENU_OPTION_HEIGHT;
     menu_option_add_sub_option(menu_ptr, "Toggle FPS Displayed", &option_toggle_show_fps_cb, opt_mpos);
 
-    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Quit", &option_quit_cb, root_mpos);
+    menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Quit", &option_quit_cb, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 }
 

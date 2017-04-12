@@ -11,7 +11,13 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -47,7 +53,7 @@ extern int g_max_fps;
 
 #define MAX_PLAYERS         (4)
 
-#define PORT                (57664)
+#define PORT                "57664"
 
 #define ASSET_PATH          "assets/"
 #define PIXEL_ASSET_PATH    ASSET_PATH "pixel.png"

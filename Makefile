@@ -7,7 +7,7 @@ else
   CFLAGS += -O2 -DNDEBUG
 endif
 
-CFLAGS  += -Wall -std=c11 -D_XOPEN_SOURCE=700
+CFLAGS  += -Wall -Wextra -pedantic -Wno-unused-parameter -std=c11 -D_GNU_SOURCE -D_XOPEN_SOURCE=700
 LDFLAGS +=
 LDLIBS  += -lpng -lz -lm
 

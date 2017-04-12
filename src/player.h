@@ -50,7 +50,7 @@ typedef struct network_player
 {
     player_t base;
 
-    int id;
+    struct sockaddr_in addr;
 }
 network_player_t;
 

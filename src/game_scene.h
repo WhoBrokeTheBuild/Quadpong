@@ -29,6 +29,7 @@ typedef struct game_scene
     int socket;
 
     int num_players;
+    int conn_players;
     game_state_t state;
     double start_delay;
 
@@ -40,14 +41,16 @@ typedef struct game_scene
 }
 game_scene_t;
 
-void game_scene_init_base(game_scene_t * scn);
-void game_scene_init_local(game_scene_t * scn, int num_players);
-void game_scene_init_host(game_scene_t * scn, int num_players);
-void game_scene_init_connect(game_scene_t * scn, const char * server);
+void game_scene_init_base(game_scene_t * gscn);
+void game_scene_init_local(game_scene_t * gscn, int num_players);
+void game_scene_init_host(game_scene_t * gscn, int num_players);
+void game_scene_init_connect(game_scene_t * gscn, const char * server);
 void game_scene_cleanup_cb(scene_t * scn);
 void game_scene_start_cb(scene_t * scn);
 void game_scene_stop_cb(scene_t * scn);
 void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt);
 void game_scene_render_cb(scene_t * scn);
+void game_scene_update_message(game_scene_t * gscn);
+void game_scene_handle_packet(game_scene_t * gscn);
 
 #endif // QUADPONG_GAME_SCENE_H
