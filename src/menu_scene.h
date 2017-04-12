@@ -21,8 +21,8 @@ typedef struct menu_option
 }
 menu_option_t;
 
-void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2_t pos);
-menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2_t pos);
+void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2f_t pos);
+menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2f_t pos);
 
 struct game_scene;
 
@@ -45,7 +45,7 @@ void menu_scene_init(menu_scene_t * scn);
 void menu_scene_cleanup_cb(scene_t * scn);
 void menu_scene_start_cb(scene_t * scn);
 void menu_scene_stop_cb(scene_t * scn);
-void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta);
+void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt);
 void menu_scene_render_cb(scene_t * scn);
 
 #endif // QUAPONG_MENU_SCENE_H

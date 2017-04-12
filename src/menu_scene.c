@@ -2,7 +2,7 @@
 #include "game_scene.h"
 #include "sprite.h"
 
-void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2_t pos)
+void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2f_t pos)
 {
     assert(NULL != opt);
 
@@ -30,7 +30,7 @@ void menu_option_cleanup(menu_option_t * opt)
     free(opt->options);
 }
 
-menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2_t pos)
+menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2f_t pos)
 {
     assert(NULL != opt);
 
@@ -104,7 +104,7 @@ void menu_scene_init(menu_scene_t * scn)
 
     scn->game_scene = NULL;
 
-    vec2_t title_pos = { 50, 50 };
+    vec2f_t title_pos = { 50, 50 };
     sprite_init(&scn->title, TITLE_ASSET_PATH);
     sprite_set_pos(&scn->title, title_pos);
 
@@ -113,7 +113,7 @@ void menu_scene_init(menu_scene_t * scn)
     sprite_set_size(&scn->arrow, arrow_size);
 
     menu_option_t * menu_ptr;
-    vec2_t root_mpos = { 50, 150 };
+    vec2f_t root_mpos = { 50, 150 };
     menu_option_init(&scn->root_option_group, NULL, NULL, root_mpos);
 
     menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Local Game", &option_local_game_cb, root_mpos);
@@ -122,7 +122,7 @@ void menu_scene_init(menu_scene_t * scn)
     menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Host Game", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
-    vec2_t host_mpos = { 50, 150 };
+    vec2f_t host_mpos = { 50, 150 };
     menu_option_add_sub_option(menu_ptr, "Two Player", &option_host_two_game_cb, host_mpos);
     host_mpos.y += MENU_OPTION_HEIGHT;
     menu_option_add_sub_option(menu_ptr, "Four Player", &option_host_four_game_cb, host_mpos);
@@ -133,7 +133,7 @@ void menu_scene_init(menu_scene_t * scn)
     menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Options", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
-    vec2_t opt_mpos = { 50, 150 };
+    vec2f_t opt_mpos = { 50, 150 };
     menu_option_add_sub_option(menu_ptr, "Toggle FPS Capped", &option_toggle_cap_fps_cb, opt_mpos);
     opt_mpos.y += MENU_OPTION_HEIGHT;
     menu_option_add_sub_option(menu_ptr, "Toggle FPS Displayed", &option_toggle_show_fps_cb, opt_mpos);
@@ -172,7 +172,7 @@ void menu_scene_stop_cb(scene_t * scn)
 
 }
 
-void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta)
+void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
 {
     menu_scene_t * mscn = (menu_scene_t *)scn;
 
@@ -181,7 +181,7 @@ void menu_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta)
         return;
     }
 
-    vec2_t arrow_pos = { 20, 170 };
+    vec2f_t arrow_pos = { 20, 170 };
     arrow_pos.y += (mscn->menu_ind * MENU_OPTION_HEIGHT);
     sprite_set_pos(&mscn->arrow, arrow_pos);
 

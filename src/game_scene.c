@@ -51,7 +51,7 @@ void game_scene_init_base(game_scene_t * scn)
     scn->host = false;
     scn->socket = 0;
 
-    vec2_t msg_pos = { (WIN_WIDTH / 2) - 50, 200 };
+    vec2f_t msg_pos = { (WIN_WIDTH / 2) - 50, 200 };
     sprite_text_init(&scn->message, g_fnt_large, "Message");
     sprite_text_set_pos(&scn->message, msg_pos);
 }
@@ -70,6 +70,7 @@ void game_scene_init_local(game_scene_t * scn, int num_players)
     }
 
     scn->state = GAME_STATE_STARTING;
+    scn->start_delay = GAME_START_DELAY;
 }
 
 void game_scene_init_host(game_scene_t * scn, int num_players)
@@ -167,7 +168,7 @@ void game_scene_stop_cb(scene_t * scn)
     }
 }
 
-void game_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta)
+void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
 {
     game_scene_t * gscn = (game_scene_t *)scn;
 
@@ -208,7 +209,18 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta)
 
     if (GAME_STATE_STARTING == gscn->state)
     {
-    
+        int secs_left = (int)gscn->start_delay / 1000;
+        gscn->start_delay -= gt->elapsed;
+        if (secs_left > (int)gscn->start_delay / 1000)
+        {
+            snprintf(gscn->message_buf, sizeof(gscn->message_buf), "%d", secs_left);
+            sprite_text_set_text(&gscn->message, gscn->message_buf);
+        }
+
+        if (0 >= gscn->start_delay)
+        {
+            gscn->state = GAME_STATE_PLAYING;
+        }
     }
     else if (gscn->state == GAME_STATE_PLAYING)
     {
@@ -218,12 +230,12 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta)
             {
                 if (gscn->players[i]->update)
                 {
-                    gscn->players[i]->update(gscn->players[i], ev, delta);
+                    gscn->players[i]->update(gscn->players[i], ev, gt);
                 }
             }
         }
 
-        ball_update(gscn->ball, gscn->players);
+        ball_update(gscn->ball, gscn->players, gt);
     }
 }
 
@@ -231,7 +243,10 @@ void game_scene_render_cb(scene_t * scn)
 {
     game_scene_t * gscn = (game_scene_t *)scn;
 
-    sprite_text_render(&gscn->message);
+    if (gscn->state != GAME_STATE_PLAYING)
+    {
+        sprite_text_render(&gscn->message);
+    }
 
     for (int i = 0; i < MAX_PLAYERS; ++i)
     {

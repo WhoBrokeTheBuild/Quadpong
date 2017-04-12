@@ -44,7 +44,7 @@ void player_render_cb(player_t * ply)
 {
     assert(NULL != ply);
 
-    vec2_t pos = { 0, 0 };
+    vec2f_t pos = { 0, 0 };
 
     switch (ply->area)
     {
@@ -92,7 +92,7 @@ void local_player_init(local_player_t * ply, area_t area, SDL_Color color, SDL_K
     ply->key_back = back;
 }
 
-void local_player_update_cb(player_t * ply, SDL_Event * ev, float delta)
+void local_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt)
 {
     assert(NULL != ply);
 
@@ -155,7 +155,7 @@ void network_player_cleanup_cb(player_t * ply)
 
 }
 
-void network_player_update_cb(player_t * ply, SDL_Event * ev, float delta)
+void network_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt)
 {
 
 }

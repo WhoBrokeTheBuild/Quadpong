@@ -1,6 +1,7 @@
 #include "quapong.h"
 #include "util.h"
 #include "menu_scene.h"
+#include "game_time.h"
 
 SDL_Window      * g_window = NULL;
 SDL_Renderer    * g_renderer = NULL;
@@ -9,7 +10,7 @@ TTF_Font * g_fnt_large = NULL;
 TTF_Font * g_fnt_small = NULL;
 
 bool g_running  = true;
-bool g_cap_fps  = false;
+bool g_cap_fps  = true;
 bool g_show_fps = false;
 int g_max_fps   = 60;
 
@@ -62,19 +63,22 @@ int main(int argc, char ** argv)
     menu_scene_init(&menu_scene);
     scene_switch((scene_t *)&menu_scene);
 
+    game_time_t gt;
+    gt.delta   = 0.0f;
+    gt.elapsed = 0.0f;
+    gt.total   = 0.0f;
+
     clock_t start;
     clock_t diff;
     double frame_delay = 0.0;
     double fps_delay   = 250.0;
     double frame_elap  = 0.0;
     double fps_elap    = 0.0;
-    double diff_ms     = 0.0;
-    double cur_fps     = 0.0;
     long frames        = 0;
     char fps_buffer[10];
     char title_buffer[30];
 
-    vec2_t fps_pos = { 0, 0 };
+    vec2f_t fps_pos = { 0, 0 };
     sprite_text_t fps_disp;
     sprite_text_init(&fps_disp, g_fnt_small, "0.00");
     fps_disp.fast = true;
@@ -85,7 +89,7 @@ int main(int argc, char ** argv)
     while (g_running)
     {
         start = clock();
-                
+    
         SDL_PollEvent(&ev);
         if (SDL_QUIT == ev.type)
         {
@@ -94,7 +98,7 @@ int main(int argc, char ** argv)
 
         if (NULL != g_cur_scene)
         {
-            g_cur_scene->update(g_cur_scene, &ev, diff_ms / frame_delay);
+            g_cur_scene->update(g_cur_scene, &ev, &gt);
         }
 
         if (!g_cap_fps || frame_delay <= frame_elap)
@@ -118,27 +122,30 @@ int main(int argc, char ** argv)
             SDL_RenderPresent(g_renderer);
         }
 
-        fps_elap += diff_ms;
+        fps_elap += gt.elapsed;
         if (fps_delay <= fps_elap)
         {
-            cur_fps = frames / fps_elap;
-            cur_fps *= 1000.0;
+            gt.fps = (frames / fps_elap) * 1000.0;
             frames = 0;
             fps_elap = 0.0;
 
             if (g_show_fps)
             {
-                snprintf(fps_buffer, sizeof(fps_buffer), "%.2f", cur_fps);
+                snprintf(fps_buffer, sizeof(fps_buffer), "%.2f", gt.fps);
                 sprite_text_set_text(&fps_disp, fps_buffer);
             }
             
-            snprintf(title_buffer, sizeof(title_buffer), "Quapong - %.2f", cur_fps);
+            snprintf(title_buffer, sizeof(title_buffer), "Quapong - %.2f", gt.fps);
             SDL_SetWindowTitle(g_window, title_buffer);
         }
 
         diff = clock() - start;
-        diff_ms = (diff * 1000.0) / CLOCKS_PER_SEC;
-        frame_elap += diff_ms;
+        
+        gt.elapsed = (diff * 1000.0) / CLOCKS_PER_SEC;
+        gt.total += gt.elapsed;
+        gt.delta = (gt.elapsed / frame_delay);
+
+        frame_elap += gt.elapsed;
         frame_delay = 1000.0 / g_max_fps;
     }
 

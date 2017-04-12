@@ -5,6 +5,8 @@
 #include "scene.h"
 #include "sprite.h"
 
+#define GAME_START_DELAY 3000
+
 struct player;
 struct ball;
 struct sprite_text;
@@ -28,8 +30,10 @@ typedef struct game_scene
 
     int num_players;
     game_state_t state;
+    double start_delay;
+
     sprite_text_t message;
-    int start_delay;
+    char message_buf[100];
 
     struct player * players[MAX_PLAYERS];
     struct ball *   ball;
@@ -43,7 +47,7 @@ void game_scene_init_connect(game_scene_t * scn, const char * server);
 void game_scene_cleanup_cb(scene_t * scn);
 void game_scene_start_cb(scene_t * scn);
 void game_scene_stop_cb(scene_t * scn);
-void game_scene_update_cb(scene_t * scn, SDL_Event * ev, float delta);
+void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt);
 void game_scene_render_cb(scene_t * scn);
 
 #endif // QUAPONG_GAME_SCENE_H

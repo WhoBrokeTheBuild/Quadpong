@@ -2,6 +2,7 @@
 #define QUAPONG_PLAYER_H
 
 #include "quapong.h"
+#include "game_time.h"
 #include "sprite.h"
 #include "vec2.h"
 
@@ -17,7 +18,7 @@ area_t;
 typedef struct player 
 {
     void (*cleanup)(struct player *);
-    void (*update)(struct player *, SDL_Event *, float);
+    void (*update)(struct player *, SDL_Event *, game_time_t *);
     void (*render)(struct player *);
 
     sprite_t * sprite;
@@ -43,7 +44,7 @@ typedef struct local_player
 local_player_t;
 
 void local_player_init(local_player_t * ply, area_t area, SDL_Color color, SDL_Keycode forward, SDL_Keycode back);
-void local_player_update_cb(player_t * ply, SDL_Event * ev, float delta);
+void local_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt);
 
 typedef struct network_player
 {
@@ -55,6 +56,6 @@ network_player_t;
 
 void network_player_init(network_player_t * ply, area_t area, SDL_Color color, int id);
 void network_player_cleanup_cb(player_t * ply);
-void network_player_update_cb(player_t * ply, SDL_Event * ev, float delta);
+void network_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt);
 
 #endif // QUAPONG_PLAYER_H

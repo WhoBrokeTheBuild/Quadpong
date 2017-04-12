@@ -13,7 +13,7 @@ void ball_init(ball_t * ball)
     ball->vel.x = cosf(angle) * 5.0f;
     ball->vel.y = sinf(angle) * 5.0f;
 
-    vec2_t pos = { (WIN_WIDTH / 2) - (BALL_SIZE / 2), (WIN_HEIGHT / 2) - (BALL_SIZE / 2) };
+    vec2f_t pos = { (WIN_WIDTH / 2) - (BALL_SIZE / 2), (WIN_HEIGHT / 2) - (BALL_SIZE / 2) };
     vec2_t size = { BALL_SIZE, BALL_SIZE };
     sprite_set_pos(ball->sprite, pos);
     sprite_set_size(ball->sprite, size);
@@ -24,11 +24,11 @@ void ball_cleanup(ball_t * ball)
     sprite_cleanup(ball->sprite);
 }
 
-void ball_update(ball_t * ball, struct player ** players)
+void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
 {
-    vec2_t pos = sprite_get_pos(ball->sprite);
-    pos.x += ball->vel.x;
-    pos.y += ball->vel.y;
+    vec2f_t pos = sprite_get_pos(ball->sprite);
+    pos.x += ball->vel.x * gt->delta;
+    pos.y += ball->vel.y * gt->delta;
 
     int p_left = -1,
         p_right = -1,
@@ -118,8 +118,8 @@ void ball_update(ball_t * ball, struct player ** players)
     }
 
     pos = sprite_get_pos(ball->sprite);
-    pos.x += ball->vel.x;
-    pos.y += ball->vel.y;
+    pos.x += ball->vel.x * gt->delta;
+    pos.y += ball->vel.y * gt->delta;
     sprite_set_pos(ball->sprite, pos);
 }
 

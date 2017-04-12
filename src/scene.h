@@ -2,6 +2,7 @@
 #define QUAPONG_SCENE_H
 
 #include "quapong.h"
+#include "game_time.h"
 #include "vec2.h"
 
 typedef struct scene
@@ -10,7 +11,7 @@ typedef struct scene
     void (*stop)(struct scene *);
 
     void (*cleanup)(struct scene *);
-    void (*update)(struct scene *, SDL_Event *, float);
+    void (*update)(struct scene *, SDL_Event *, game_time_t *);
     void (*render)(struct scene *);
 
     struct scene * prev;
