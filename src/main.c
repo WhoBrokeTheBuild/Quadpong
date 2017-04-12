@@ -8,7 +8,10 @@ SDL_Renderer    * g_renderer = NULL;
 TTF_Font * g_fnt_large = NULL;
 TTF_Font * g_fnt_small = NULL;
 
-bool g_running = true;
+bool g_running  = true;
+bool g_cap_fps  = false;
+bool g_show_fps = false;
+int g_max_fps   = 60;
 
 int main(int argc, char ** argv)
 {
@@ -59,23 +62,22 @@ int main(int argc, char ** argv)
     menu_scene_init(&menu_scene);
     scene_switch((scene_t *)&menu_scene);
 
-    const int MAX_FPS = 60;
-    const double MAX_DELAY = 1000.0 / MAX_FPS;
-    const double FPS_DELAY = 1000.0;
-    const bool CAP_FPS = true;
-
     clock_t start;
     clock_t diff;
-    double frame_delay = MAX_DELAY;
+    double frame_delay = 0.0;
+    double fps_delay   = 250.0;
+    double frame_elap  = 0.0;
+    double fps_elap    = 0.0;
     double diff_ms     = 0.0;
     double cur_fps     = 0.0;
-    double fps_delay   = 0.0;
-    long frames       = 0;
+    long frames        = 0;
     char fps_buffer[10];
+    char title_buffer[30];
 
     vec2_t fps_pos = { 0, 0 };
     sprite_text_t fps_disp;
-    sprite_text_init(&fps_disp, g_fnt_small, "0");
+    sprite_text_init(&fps_disp, g_fnt_small, "0.00");
+    fps_disp.fast = true;
     sprite_text_set_pos(&fps_disp, fps_pos);
 
     SDL_Event ev;
@@ -92,18 +94,21 @@ int main(int argc, char ** argv)
 
         if (NULL != g_cur_scene)
         {
-            g_cur_scene->update(g_cur_scene, &ev, diff_ms / MAX_DELAY);
+            g_cur_scene->update(g_cur_scene, &ev, diff_ms / frame_delay);
         }
 
-        if (!CAP_FPS || MAX_DELAY <= frame_delay)
+        if (!g_cap_fps || frame_delay <= frame_elap)
         {
             ++frames;
-            frame_delay = 0.0;
+            frame_elap = 0.0;
 
             SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 255); 
             SDL_RenderClear(g_renderer);
 
-            sprite_text_render(&fps_disp);
+            if (g_show_fps)
+            {
+                sprite_text_render(&fps_disp);
+            }
 
             if (NULL != g_cur_scene)
             {
@@ -113,21 +118,28 @@ int main(int argc, char ** argv)
             SDL_RenderPresent(g_renderer);
         }
 
-        fps_delay += diff_ms;
-        if (FPS_DELAY <= fps_delay)
+        fps_elap += diff_ms;
+        if (fps_delay <= fps_elap)
         {
-            cur_fps = frames / fps_delay;
+            cur_fps = frames / fps_elap;
             cur_fps *= 1000.0;
             frames = 0;
-            fps_delay = 0.0;
+            fps_elap = 0.0;
 
-            snprintf(fps_buffer, sizeof(fps_buffer), "%.2f", cur_fps);
-            sprite_text_set_text(&fps_disp, fps_buffer);
+            if (g_show_fps)
+            {
+                snprintf(fps_buffer, sizeof(fps_buffer), "%.2f", cur_fps);
+                sprite_text_set_text(&fps_disp, fps_buffer);
+            }
+            
+            snprintf(title_buffer, sizeof(title_buffer), "Quapong - %.2f", cur_fps);
+            SDL_SetWindowTitle(g_window, title_buffer);
         }
 
         diff = clock() - start;
         diff_ms = (diff * 1000.0) / CLOCKS_PER_SEC;
-        frame_delay += diff_ms;
+        frame_elap += diff_ms;
+        frame_delay = 1000.0 / g_max_fps;
     }
 
     sprite_text_cleanup(&fps_disp);

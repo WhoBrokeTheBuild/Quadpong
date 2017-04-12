@@ -24,6 +24,10 @@ extern TTF_Font * g_fnt_large;
 extern TTF_Font * g_fnt_small;
 
 extern bool g_running;
+extern bool g_cap_fps;
+extern bool g_show_fps;
+extern int g_max_fps;
+
 
 #define WIN_WIDTH           (700)
 #define WIN_HEIGHT          (700 + 20)

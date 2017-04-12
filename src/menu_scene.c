@@ -79,6 +79,16 @@ void option_connect_game_cb(menu_scene_t * scn)
     scene_push((scene_t *)scn->game_scene);
 }
 
+void option_toggle_cap_fps_cb(menu_scene_t * scn)
+{
+    g_cap_fps = !g_cap_fps;
+}
+
+void option_toggle_show_fps_cb(menu_scene_t * scn)
+{
+    g_show_fps = !g_show_fps;
+}
+
 void menu_scene_init(menu_scene_t * scn)
 {
     assert(NULL != scn);
@@ -119,6 +129,14 @@ void menu_scene_init(menu_scene_t * scn)
 
     menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Connect to Game", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
+    
+    menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Options", NULL, root_mpos);
+    root_mpos.y += MENU_OPTION_HEIGHT;
+
+    vec2_t opt_mpos = { 50, 150 };
+    menu_option_add_sub_option(menu_ptr, "Toggle FPS Capped", &option_toggle_cap_fps_cb, opt_mpos);
+    opt_mpos.y += MENU_OPTION_HEIGHT;
+    menu_option_add_sub_option(menu_ptr, "Toggle FPS Displayed", &option_toggle_show_fps_cb, opt_mpos);
 
     menu_ptr = menu_option_add_sub_option(&scn->root_option_group, "Quit", &option_quit_cb, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;

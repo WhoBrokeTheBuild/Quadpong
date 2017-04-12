@@ -1,5 +1,13 @@
 
-CFLAGS  += -g -Wall -std=c11 -D_XOPEN_SOURCE=700
+CONF ?= debug
+
+ifeq ($(CONF),debug)
+  CFLAGS += -g
+else
+  CFLAGS += -O2 -DNDEBUG
+endif
+
+CFLAGS  += -Wall -std=c11 -D_XOPEN_SOURCE=700
 LDFLAGS +=
 LDLIBS  += -lpng -lz -lm
 
