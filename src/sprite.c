@@ -40,6 +40,7 @@ void sprite_text_init(sprite_text_t * spr, TTF_Font * font, const char * text)
 {
     sprite_t * base = (sprite_t *)spr;
 
+    spr->fast = false;
     spr->font = font;
     sprite_text_set_text(spr, text);
 
@@ -54,7 +55,14 @@ void sprite_text_set_text(sprite_text_t * spr, const char * text)
     SDL_Surface * surf;
     SDL_Color color = { 255, 255, 255, 0 };
 
-    surf = TTF_RenderText_Solid(spr->font, text, color);
+    if (spr->fast)
+    {
+        surf = TTF_RenderText_Solid(spr->font, text, color);
+    }
+    else
+    {
+        surf = TTF_RenderText_Blended(spr->font, text, color);
+    }
     base->texture = SDL_CreateTextureFromSurface(g_renderer, surf);
 
     base->src_rect.w = base->dst_rect.w = surf->w;

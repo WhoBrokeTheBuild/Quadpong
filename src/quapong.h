@@ -9,6 +9,9 @@
 #include <time.h>
 #include <math.h>
 #include <assert.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -22,8 +25,8 @@ extern TTF_Font * g_fnt_small;
 
 extern bool g_running;
 
-#define WIN_WIDTH           (600)
-#define WIN_HEIGHT          (600 + 20)
+#define WIN_WIDTH           (700)
+#define WIN_HEIGHT          (700 + 20)
 
 #define FONT_LARGE_SIZE     (40)
 #define FONT_SMALL_SIZE     (20)
@@ -38,6 +41,8 @@ extern bool g_running;
 #define CORNER_SIZE         ((PLAYER_V_WIDTH + (PLAYER_V_WIDTH / 2)))
 
 #define MAX_PLAYERS         (4)
+
+#define PORT                (57664)
 
 #define ASSET_PATH          "assets/"
 #define PIXEL_ASSET_PATH    ASSET_PATH "pixel.png"

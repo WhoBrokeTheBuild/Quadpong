@@ -54,7 +54,8 @@ static inline void sprite_set_size(sprite_t * spr, vec2_t size)
 typedef struct sprite_text
 {
     sprite_t base;
-    
+
+    bool fast;
     TTF_Font * font;
 }
 sprite_text_t;

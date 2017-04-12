@@ -1,5 +1,6 @@
 #include "ball.h"
 #include "player.h"
+#include "scene.h"
 
 void ball_init(ball_t * ball)
 {
@@ -44,8 +45,6 @@ void ball_update(ball_t * ball, struct player ** players)
             ball->color = players[i]->color;
             SDL_SetTextureColorMod(ball->sprite->texture, ball->color.r, ball->color.g, ball->color.b);
 
-
-
             if (AREA_LEFT == players[i]->area || AREA_RIGHT == players[i]->area)
             {
                 ball->vel.x = -ball->vel.x;
@@ -70,11 +69,11 @@ void ball_update(ball_t * ball, struct player ** players)
         if (-1 != p_left)
         {
             printf("Player %d loses\n", p_left);
-            exit(0); // TODO: Improve
+            scene_pop();
+            return;
         }
         else
         {
-            printf("Bounce left\n");
             ball->vel.x = -ball->vel.x;
         }
     }
@@ -83,11 +82,11 @@ void ball_update(ball_t * ball, struct player ** players)
         if (-1 != p_top)
         {
             printf("Player %d loses\n", p_top);
-            exit(0); // TODO: Improve
+            scene_pop();
+            return;
         }
         else
         {
-            printf("Bounce top\n");
             ball->vel.y = -ball->vel.y;
         }
     }
@@ -96,11 +95,11 @@ void ball_update(ball_t * ball, struct player ** players)
         if (-1 != p_right)
         {
             printf("Player %d loses\n", p_right);
-            exit(0); // TODO: Improve
+            scene_pop();
+            return;
         }
         else
         {
-            printf("Bounce right\n");
             ball->vel.x = -ball->vel.x;
         }
     }
@@ -109,11 +108,11 @@ void ball_update(ball_t * ball, struct player ** players)
         if (-1 != p_bot)
         {
             printf("Player %d loses\n", p_bot);
-            exit(0); // TODO: Improve
+            scene_pop();
+            return;
         }
         else
         {
-            printf("Bounce bottom\n");
             ball->vel.y = -ball->vel.y;
         }
     }

@@ -17,7 +17,7 @@ area_t;
 typedef struct player 
 {
     void (*cleanup)(struct player *);
-    void (*update)(struct player *, SDL_Event *);
+    void (*update)(struct player *, SDL_Event *, float);
     void (*render)(struct player *);
 
     sprite_t * sprite;
@@ -28,10 +28,9 @@ typedef struct player
 }
 player_t;
 
-void player_init(player_t * ply, area_t area);
-void player_cleanup_cb(player_t *);
-void player_update_cb(player_t *, SDL_Event *);
-void player_render_cb(player_t *);
+void player_init(player_t * ply, area_t area, SDL_Color color);
+void player_cleanup_cb(player_t * ply);
+void player_render_cb(player_t * ply);
 
 typedef struct local_player
 {
@@ -43,19 +42,19 @@ typedef struct local_player
 }
 local_player_t;
 
-void local_player_init(local_player_t * ply, area_t area, SDL_Keycode forward, SDL_Keycode back);
-void local_player_update_cb(player_t * ply, SDL_Event * ev);
+void local_player_init(local_player_t * ply, area_t area, SDL_Color color, SDL_Keycode forward, SDL_Keycode back);
+void local_player_update_cb(player_t * ply, SDL_Event * ev, float delta);
 
 typedef struct network_player
 {
     player_t base;
 
-    int sock; // TODO: Help
+    int id;
 }
 network_player_t;
 
-void network_player_init(network_player_t * ply, area_t area, int sock);
+void network_player_init(network_player_t * ply, area_t area, SDL_Color color, int id);
 void network_player_cleanup_cb(player_t * ply);
-void network_player_update_cb(player_t * ply, SDL_Event * ev);
+void network_player_update_cb(player_t * ply, SDL_Event * ev, float delta);
 
 #endif // QUAPONG_PLAYER_H

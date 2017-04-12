@@ -1,18 +1,8 @@
 #include "player.h"
 
-SDL_Color player_colors[] = {
-    { 255,   0,   0, 255 },
-    {   0, 255,   0, 255 },
-    {   0,   0, 255, 255 },
-    { 255,   0, 255, 255 }
-};
-
-void player_init(player_t * ply, area_t area)
+void player_init(player_t * ply, area_t area, SDL_Color color)
 {
     assert(NULL != ply);
-
-    static int player_ind = -1;
-    ++player_ind;
 
     ply->cleanup = &player_cleanup_cb;
     ply->update = NULL;
@@ -35,11 +25,11 @@ void player_init(player_t * ply, area_t area)
         sprite_set_size(ply->sprite, size);
     }
 
-    ply->color = player_colors[player_ind];
-    SDL_SetTextureColorMod(ply->sprite->texture, 
-            player_colors[player_ind].r,
-            player_colors[player_ind].g,
-            player_colors[player_ind].b);
+    ply->color = color;
+    SDL_SetTextureColorMod(ply->sprite->texture,
+            ply->color.r,
+            ply->color.g,
+            ply->color.b);
 }
 
 void player_cleanup_cb(player_t * ply)
@@ -88,12 +78,12 @@ void player_render_cb(player_t * ply)
     sprite_render(ply->sprite);
 }
 
-void local_player_init(local_player_t * ply, area_t area, SDL_Keycode forward, SDL_Keycode back)
+void local_player_init(local_player_t * ply, area_t area, SDL_Color color, SDL_Keycode forward, SDL_Keycode back)
 {
     assert(NULL != ply);
 
     player_t * base = (player_t *)ply;
-    player_init(base, area);
+    player_init(base, area, color);
 
     base->update = &local_player_update_cb;
 
@@ -102,7 +92,7 @@ void local_player_init(local_player_t * ply, area_t area, SDL_Keycode forward, S
     ply->key_back = back;
 }
 
-void local_player_update_cb(player_t * ply, SDL_Event * ev)
+void local_player_update_cb(player_t * ply, SDL_Event * ev, float delta)
 {
     assert(NULL != ply);
 
@@ -115,7 +105,7 @@ void local_player_update_cb(player_t * ply, SDL_Event * ev)
         }
         else if (ev->key.keysym.sym == lply->key_back)
         {
-            lply->dir = -1;    
+            lply->dir = -1;
         }
     }
     else if (SDL_KEYUP == ev->type)
@@ -135,7 +125,7 @@ void local_player_update_cb(player_t * ply, SDL_Event * ev)
             }
         }
     }
-    
+
     if (0 < lply->dir)
     {
         ++ply->movement;
@@ -154,9 +144,10 @@ void local_player_update_cb(player_t * ply, SDL_Event * ev)
     }
 }
 
-void network_player_init(network_player_t * ply, area_t area, int sock)
+void network_player_init(network_player_t * ply, area_t area, SDL_Color color, int id)
 {
-
+    player_t * base = (player_t *)ply;
+    player_init(base, area, color);
 }
 
 void network_player_cleanup_cb(player_t * ply)
@@ -164,7 +155,7 @@ void network_player_cleanup_cb(player_t * ply)
 
 }
 
-void network_player_update_cb(player_t * ply, SDL_Event * ev)
+void network_player_update_cb(player_t * ply, SDL_Event * ev, float delta)
 {
 
 }
