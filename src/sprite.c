@@ -34,7 +34,10 @@ void sprite_render(sprite_t * spr)
 {
     assert(NULL != spr);
 
-    SDL_RenderCopy(g_renderer, spr->texture, &spr->src_rect, &spr->dst_rect);
+    if (NULL != spr->texture)
+    {
+        SDL_RenderCopy(g_renderer, spr->texture, &spr->src_rect, &spr->dst_rect);
+    }
 }
 
 void sprite_calc_align(sprite_t * spr)
@@ -75,6 +78,7 @@ void sprite_text_init(sprite_text_t * tspr, TTF_Font * font, const char * text)
 
     tspr->fast = false;
     tspr->font = font;
+    spr->texture = NULL;
     spr->align = SPRITE_ALIGN_TOP_LEFT;
     sprite_text_set_text(tspr, text);
 
@@ -88,6 +92,17 @@ void sprite_text_set_text(sprite_text_t * tspr, const char * text)
 
     SDL_Surface * surf;
     SDL_Color color = { 255, 255, 255, 0 };
+
+    if (NULL != spr->texture)
+    {
+        SDL_DestroyTexture(spr->texture);
+        spr->texture = NULL;
+    }
+
+    if (text == NULL)
+    {
+        return;
+    }
 
     if (tspr->fast)
     {

@@ -7,12 +7,9 @@ void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(m
     assert(NULL != opt);
 
     opt->parent = NULL;
-
-    if (NULL != text)
-    {
-        sprite_text_init(&opt->sprite, g_fnt_large, text);
-        sprite_text_set_pos(&opt->sprite, pos);
-    }
+    
+    sprite_text_init(&opt->sprite, g_fnt_large, text);
+    sprite_text_set_pos(&opt->sprite, pos);
 
     opt->num_options = 0;
     opt->selected = selected;
