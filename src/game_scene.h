@@ -26,7 +26,11 @@ typedef struct game_scene
     scene_t base;
 
     bool host;
+#ifdef WIN32
+	SOCKET socket;
+#else
     int socket;
+#endif
 
     int num_players;
     int conn_players;

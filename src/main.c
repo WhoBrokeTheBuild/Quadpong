@@ -19,7 +19,7 @@ int main(int argc, char ** argv)
     int             retval = 0;
     menu_scene_t    menu_scene;
 
-    srand(time(0));
+    srand((uint32_t)time(0));
 
     if (0 > SDL_Init(SDL_INIT_EVERYTHING))
     {
@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
         fps_elap += gt.elapsed;
         if (fps_delay <= fps_elap)
         {
-            gt.fps = (frames / fps_elap) * 1000.0;
+            gt.fps = (float)((frames / fps_elap) * 1000.0f);
             frames = 0;
             fps_elap = 0.0;
 
@@ -143,7 +143,7 @@ int main(int argc, char ** argv)
         
         gt.elapsed = (diff * 1000.0) / CLOCKS_PER_SEC;
         gt.total += gt.elapsed;
-        gt.delta = (gt.elapsed / frame_delay);
+        gt.delta = (float)(gt.elapsed / frame_delay);
 
         frame_elap += gt.elapsed;
         frame_delay = 1000.0 / g_max_fps;

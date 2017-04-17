@@ -107,10 +107,14 @@ void game_scene_init_host(game_scene_t * gscn, int num_players)
         if (0 > gscn->socket)
             continue;
 
-        if (0 == bind(gscn->socket, rptr->ai_addr, rptr->ai_addrlen))
+        if (0 == bind(gscn->socket, rptr->ai_addr, (socklen_t)rptr->ai_addrlen))
             break;
 
-        close(gscn->socket);
+#ifdef WIN32
+		closesocket(gscn->socket);
+#else
+		close(gscn->socket);
+#endif
     }
 
     if (NULL == rptr)
@@ -136,7 +140,11 @@ void game_scene_init_host(game_scene_t * gscn, int num_players)
 error_socket:
 
     freeaddrinfo(result);
-    close(gscn->socket);
+#ifdef WIN32
+	closesocket(gscn->socket);
+#else
+	close(gscn->socket);
+#endif
     gscn->socket = 0;
 
     scene_pop();
@@ -176,10 +184,14 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
         if (0 > gscn->socket)
             continue;
 
-        if (0 == connect(gscn->socket, rptr->ai_addr, rptr->ai_addrlen))
+        if (0 == connect(gscn->socket, rptr->ai_addr, (socklen_t)rptr->ai_addrlen))
             break;
 
-        close(gscn->socket);
+#ifdef WIN32
+		closesocket(gscn->socket);
+#else
+		close(gscn->socket);
+#endif
     }
 
     if (NULL == rptr)
@@ -204,7 +216,11 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
 error_socket:
 
     freeaddrinfo(result);
-    close(gscn->socket);
+#ifdef WIN32
+	closesocket(gscn->socket);
+#else
+	close(gscn->socket);
+#endif
     gscn->socket = 0;
 
     scene_pop();
@@ -214,7 +230,11 @@ void game_scene_cleanup_cb(scene_t * scn)
 {
     game_scene_t * gscn = (game_scene_t *)scn;
 
-    close(gscn->socket);
+#ifdef WIN32
+	closesocket(gscn->socket);
+#else
+	close(gscn->socket);
+#endif
 
     for (int i = 0; i < MAX_PLAYERS; ++i)
     {
@@ -265,7 +285,7 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
         FD_ZERO(&fds);
         FD_SET(gscn->socket, &fds);
 
-        if (0 > select(gscn->socket + 1, &fds, NULL, NULL, &tv))
+        if (0 > select((int)gscn->socket + 1, &fds, NULL, NULL, &tv))
         {
             fprintf(stderr, "Socket closed unexpectedly\n");
             scene_pop();

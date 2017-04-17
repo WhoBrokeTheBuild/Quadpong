@@ -9,7 +9,7 @@ void ball_init(ball_t * ball)
 
     ball->last_hit = -1;
 
-    int angle = RAD(rand() % 360);
+    float angle = (float)RAD(rand() % 360);
     ball->vel.x = cosf(angle) * 5.0f;
     ball->vel.y = sinf(angle) * 5.0f;
 

@@ -1,0 +1,65 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
+
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
+PROJECT(Quadpong)
+
+INCLUDE_DIRECTORIES(
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_BINARY_DIR}
+)
+
+SET(EXE "quadpong")
+
+SET(
+    ${EXE}_SRCS
+	src/quadpong.h
+	src/main.c
+	src/ball.h
+	src/ball.c
+	src/player.h
+	src/player.c
+	src/sprite.h
+	src/sprite.c
+	src/scene.h
+	src/scene.c
+	src/game_scene.h
+	src/game_scene.c
+	src/menu_scene.h
+	src/menu_scene.c
+	src/util.h
+	src/util.c
+	src/game_time.h
+    src/vec2.h
+)
+
+ADD_EXECUTABLE(
+    ${EXE}
+    ${${EXE}_SRCS}
+)
+
+FIND_PACKAGE(SDL2 REQUIRED)
+FIND_PACKAGE(SDL2_image REQUIRED)
+FIND_PACKAGE(SDL2_ttf REQUIRED)
+
+IF(SDL2_FOUND AND SDL2_IMAGE_FOUND AND SDL2_TTF_FOUND)
+	INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR})
+	TARGET_LINK_LIBRARIES(${EXE} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY})
+ENDIF()
+
+IF(WIN32)
+	SET_TARGET_PROPERTIES(${EXE} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+	TARGET_LINK_LIBRARIES(${EXE} WS2_32)
+ENDIF()
+
+IF(UNIX)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wno-unused-parameter -std=c11 -D_GNU_SOURCE -D_XOPEN_SOURCE=700")
+	TARGET_LINK_LIBRARIES(${EXE} png z m)
+	
+	ADD_CUSTOM_TARGET(
+		run
+		COMMAND ${CMAKE_BINARY_DIR}/${EXE}
+		DEPENDS ${EXE}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	)
+ENDIF()

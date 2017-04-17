@@ -9,15 +9,29 @@
 #include <time.h>
 #include <math.h>
 #include <assert.h>
-#include <unistd.h>
 #include <string.h>
 #include <errno.h>
+
+#ifdef WIN32
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <ws2tcpip.h>
+
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+
+#else 
+
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#endif // WIN32
 
 #include <SDL.h>
 #include <SDL_image.h>
