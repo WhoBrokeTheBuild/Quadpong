@@ -1,0 +1,55 @@
+
+struct p_vec2 {
+    x:float;
+    y:float;
+}
+
+struct p_color {
+    r:ushort;
+    g:ushort;
+    b:ushort;
+}
+
+struct p_ball {
+    pos:p_vec2;
+    vel:p_vec2;
+    color:p_color;
+}
+
+enum p_area:ushort {
+    invalid = 0,
+    top    = 1,
+    bottom = 2,
+    left   = 3,
+    right  = 4,
+}
+
+enum p_game_state:ushort {
+    invalid = 0,
+    waiting_for_players = 1,
+    connecting          = 2,
+    starting            = 3,
+    playing             = 4,
+    paused              = 5,
+}
+
+struct p_player {
+    pos:p_vec2;
+    vel:p_vec2;
+    color:p_color;
+    area:p_area;
+}
+
+table p_join_packet {
+
+}
+
+table p_welcome_packet {
+    player:p_player;
+}
+
+table p_update_packet {
+    state:p_game_state;
+    ball:p_ball;
+    players:[p_player];
+}

@@ -1,7 +1,7 @@
 #ifndef QUADPONG_H
 #define QUADPONG_H
 
-#define _MATH_DEFINES_DEFINED 
+#define _MATH_DEFINES_DEFINED
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,6 +68,8 @@ extern int g_max_fps;
 #define MAX_PLAYERS         (4)
 
 #define PORT                "57664"
+#define UPDATE_DELAY        (60)
+#define MAX_PLAYER_TTL      (UPDATE_DELAY * 4)
 
 #define ASSET_PATH          "assets/"
 #define PIXEL_ASSET_PATH    ASSET_PATH "pixel.png"

@@ -26,9 +26,9 @@ void ball_cleanup(ball_t * ball)
 
 void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
 {
-    vec2f_t pos = sprite_get_pos(ball->sprite);
-    pos.x += ball->vel.x * gt->delta;
-    pos.y += ball->vel.y * gt->delta;
+    vec2f_t tpos = ball->pos;
+    tpos.x += ball->vel.x * gt->delta;
+    tpos.y += ball->vel.y * gt->delta;
 
     int p_left = -1,
         p_right = -1,
@@ -64,7 +64,7 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
         }
     }
 
-    if (0 >= pos.x)
+    if (0 >= tpos.x)
     {
         if (-1 != p_left)
         {
@@ -77,7 +77,7 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
             ball->vel.x = -ball->vel.x;
         }
     }
-    else if (0 >= pos.y)
+    else if (0 >= tpos.y)
     {
         if (-1 != p_top)
         {
@@ -90,7 +90,7 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
             ball->vel.y = -ball->vel.y;
         }
     }
-    else if (WIN_WIDTH <= pos.x)
+    else if (WIN_WIDTH <= tpos.x)
     {
         if (-1 != p_right)
         {
@@ -103,7 +103,7 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
             ball->vel.x = -ball->vel.x;
         }
     }
-    else if (WIN_HEIGHT <= pos.y)
+    else if (WIN_HEIGHT <= tpos.y)
     {
         if (-1 != p_bot)
         {
@@ -117,10 +117,9 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
         }
     }
 
-    pos = sprite_get_pos(ball->sprite);
-    pos.x += ball->vel.x * gt->delta;
-    pos.y += ball->vel.y * gt->delta;
-    sprite_set_pos(ball->sprite, pos);
+    ball->pos.x += ball->vel.x * gt->delta;
+    ball->pos.y += ball->vel.y * gt->delta;
+    sprite_set_pos(ball->sprite, ball->pos);
 }
 
 void ball_render(ball_t * ball)

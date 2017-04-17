@@ -51,6 +51,8 @@ void game_scene_init_base(game_scene_t * gscn)
     sprite_text_init(&gscn->message, g_fnt_large, " ");
     sprite_text_set_align(&gscn->message, SPRITE_ALIGN_CENTER);
     sprite_text_set_pos(&gscn->message, msg_pos);
+
+    flatcc_builder_init(&gscn->fbs);
 }
 
 void game_scene_init_local(game_scene_t * gscn, int num_players)
@@ -75,10 +77,10 @@ void game_scene_init_local(game_scene_t * gscn, int num_players)
 void game_scene_init_host(game_scene_t * gscn, int num_players)
 {
     game_scene_init_base(gscn);
-    
+
     int err;
     struct addrinfo hints;
-    struct addrinfo * result = NULL, 
+    struct addrinfo * result = NULL,
                     * rptr = NULL;
 
     gscn->num_players = num_players;
@@ -101,7 +103,7 @@ void game_scene_init_host(game_scene_t * gscn, int num_players)
         goto error_socket;
     }
 
-    for (rptr = result; NULL != rptr; rptr = rptr->ai_next) 
+    for (rptr = result; NULL != rptr; rptr = rptr->ai_next)
     {
         gscn->socket = socket(rptr->ai_family, rptr->ai_socktype, rptr->ai_protocol);
         if (0 > gscn->socket)
@@ -153,10 +155,10 @@ error_socket:
 void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
 {
     game_scene_init_base(gscn);
-    
+
     int err;
     struct addrinfo hints;
-    struct addrinfo * result = NULL, 
+    struct addrinfo * result = NULL,
                     * rptr = NULL;
 
     gscn->host = false;
@@ -164,8 +166,8 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
     gscn->conn_players = 0;
 
     gscn->state = GAME_STATE_CONNECTING;
-    game_scene_update_message(gscn); 
-    
+    game_scene_update_message(gscn);
+
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
@@ -202,14 +204,18 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
 
     freeaddrinfo(result);
 
-    const char tmp[] = "ping";
-    if ((ssize_t)sizeof(tmp) > send(gscn->socket, tmp, sizeof(tmp), 0))
+    p_welcome_packet_start_as_root(&gscn->fbs);
+    // TODO: ?
+    p_welcome_packet_end_as_root(&gscn->fbs);
+
+    size_t size;
+    uint8_t * buf = flatcc_builder_finalize_aligned_buffer(&gscn->fbs, &size);
+
+    if ((ssize_t)size > send(gscn->socket, buf, size, 0))
     {
         fprintf(stderr, "Failed to send data to server\n");
         goto error_socket;
     }
-
-    // TODO: Send Hello Packet
 
     return;
 
@@ -235,6 +241,7 @@ void game_scene_cleanup_cb(scene_t * scn)
 #else
 	close(gscn->socket);
 #endif
+    flatcc_builder_clear(&gscn->fbs);
 
     for (int i = 0; i < MAX_PLAYERS; ++i)
     {
@@ -295,6 +302,24 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
         if (FD_ISSET(gscn->socket, &fds))
         {
             game_scene_handle_packet(gscn);
+        }
+
+        if (gscn->host)
+        {
+            game_scene_send_updates(gscn);
+
+            for (int i = 1; i < gscn->conn_players; ++i)
+            {
+                player_t * ply = gscn->players[i];
+                network_player_t * nply = (network_player_t *)ply;
+
+                nply->ttl -= gt->elapsed;
+                if (0 >= nply->ttl)
+                {
+                    fprintf(stderr, "Player %d disconnected\n", i);
+                    scene_pop();
+                }
+            }
         }
     }
 
@@ -406,7 +431,15 @@ void game_scene_handle_packet(game_scene_t * gscn)
             return;
         }
 
+        int player_ind = gscn->conn_players;
         ++gscn->conn_players;
+
+        gscn->players[player_ind] = (player_t *)malloc(sizeof(network_player_t));
+        network_player_t * nply = (network_player_t *)gscn->players[player_ind];
+        network_player_init(nply, area_opts[player_ind], color_opts[player_ind], &addr, addrlen);
+
+        ++gscn->conn_players;
+
         if (gscn->conn_players == gscn->num_players)
         {
             gscn->state = GAME_STATE_STARTING;
@@ -414,4 +447,47 @@ void game_scene_handle_packet(game_scene_t * gscn)
     }
 }
 
+void game_scene_send_updates(game_scene_t * gscn)
+{
+    size_t size;
+    uint8_t * buf = NULL;
 
+    p_update_packet_start_as_root(&gscn->fbs);
+    p_update_packet_state_add(&gscn->fbs, (p_game_state_enum_t)gscn->state);
+
+    // TODO: Move?
+    p_update_packet_ball_create(&gscn->fbs,
+        gscn->ball->pos.x, gscn->ball->pos.y,
+        gscn->ball->vel.x, gscn->ball->vel.y,
+        gscn->ball->color.r, gscn->ball->color.g, gscn->ball->color.b);
+
+    for (int i = 1; i < gscn->conn_players; ++i)
+    {
+        player_t * ply = gscn->players[i];
+        network_player_t * nply = (network_player_t *)ply;
+
+        p_update_packet_players_push_create(&gscn->fbs,
+            ply->pos.x, ply->pos.y,
+            ply->vel.x, ply->vel.y,
+            ply->color.r, ply->color.g, ply->color.b,
+            (p_area_enum_t)ply->area);
+    }
+
+    p_update_packet_end_as_root(&gscn->fbs);
+
+    buf = flatcc_builder_finalize_aligned_buffer(&gscn->fbs, &size);
+
+    for (int i = 1; i < gscn->conn_players; ++i)
+    {
+        player_t * ply = gscn->players[i];
+        network_player_t * nply = (network_player_t *)ply;
+
+        if ((ssize_t)size > sendto(gscn->socket, buf, size, 0, &nply->addr, sizeof(nply->addr)))
+        {
+            fprintf(stderr, "Failed to send data to client\n");
+            continue;
+        }
+
+        nply->ttl = MAX_PLAYER_TTL;
+    }
+}

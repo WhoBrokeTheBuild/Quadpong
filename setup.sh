@@ -41,3 +41,8 @@ case $distro in
         echo "Unsupported Distro"
         ;;
 esac
+
+git clone git@github.com:dvidelabs/flatcc.git /tmp/flatcc
+cd /tmp/flatcc
+scripts/initbuild.sh make-concurrent
+scripts/build.sh

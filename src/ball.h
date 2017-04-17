@@ -11,6 +11,7 @@ typedef struct ball
     sprite_t * sprite;
     int last_hit;
     SDL_Color color;
+    vec2f_t pos;
     vec2f_t vel;
 }
 ball_t;

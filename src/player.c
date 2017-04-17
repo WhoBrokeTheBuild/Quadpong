@@ -9,7 +9,6 @@ void player_init(player_t * ply, area_t area, SDL_Color color)
     ply->render = &player_render_cb;
     ply->score = 0;
     ply->area = area;
-    ply->movement = 50;
 
     ply->sprite = (sprite_t *)malloc(sizeof(sprite_t));
     sprite_init(ply->sprite, PIXEL_ASSET_PATH);
@@ -44,37 +43,6 @@ void player_render_cb(player_t * ply)
 {
     assert(NULL != ply);
 
-    vec2f_t pos = { 0, 0 };
-
-    switch (ply->area)
-    {
-    case AREA_LEFT:
-
-        pos.x = (PLAYER_V_WIDTH / 2);
-        pos.y = ((ply->movement / 100.0f) * (WIN_HEIGHT - PLAYER_V_HEIGHT - (CORNER_SIZE * 2))) + CORNER_SIZE;
-
-        break;
-    case AREA_RIGHT:
-
-        pos.x = WIN_WIDTH - (PLAYER_V_WIDTH / 2) - PLAYER_V_WIDTH;
-        pos.y = ((ply->movement / 100.0f) * (WIN_HEIGHT - PLAYER_V_HEIGHT - (CORNER_SIZE * 2))) + CORNER_SIZE;
-
-        break;
-    case AREA_TOP:
-
-        pos.x = ((ply->movement / 100.0f) * (WIN_WIDTH - PLAYER_H_WIDTH - (CORNER_SIZE * 2))) + CORNER_SIZE;
-        pos.y = (PLAYER_H_HEIGHT / 2);
-
-        break;
-    case AREA_BOTTOM:
-
-        pos.x = ((ply->movement / 100.0f) * (WIN_WIDTH - PLAYER_H_WIDTH - (CORNER_SIZE * 2))) + CORNER_SIZE;
-        pos.y = WIN_HEIGHT - (PLAYER_H_HEIGHT / 2) - PLAYER_H_HEIGHT;
-
-        break;
-    }
-
-    sprite_set_pos(ply->sprite, pos);
     sprite_render(ply->sprite);
 }
 
@@ -126,36 +94,28 @@ void local_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt)
         }
     }
 
-    if (0 < lply->dir)
-    {
-        ++ply->movement;
-        if (100 < ply->movement)
-        {
-            ply->movement = 100;
-        }
-    }
-    else if (0 > lply->dir)
-    {
-        --ply->movement;
-        if (0 > ply->movement)
-        {
-            ply->movement = 0;
-        }
-    }
+    // TODO: Movement
+
+    ply->pos.x += ply->vel.x * gt->delta;
+    ply->pos.y += ply->vel.y * gt->delta;
+    sprite_set_pos(ply->sprite, ply->pos);
 }
 
-void network_player_init(network_player_t * ply, area_t area, SDL_Color color, int id)
+void network_player_init(network_player_t * nply, area_t area, SDL_Color color, struct sockaddr_in * addr, socklen_t addrlen)
 {
-    player_t * base = (player_t *)ply;
-    player_init(base, area, color);
+    player_t * ply = (player_t *)nply;
+    player_init(ply, area, color);
+
+    memcpy(&nply->addr, addr, addrlen);
+    nply->ttl = MAX_PLAYER_TTL;
 }
 
-void network_player_cleanup_cb(player_t * ply)
+void network_player_cleanup_cb(player_t * nply)
 {
 
 }
 
-void network_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt)
+void network_player_update_cb(player_t * nply, SDL_Event * ev, game_time_t * gt)
 {
 
 }
