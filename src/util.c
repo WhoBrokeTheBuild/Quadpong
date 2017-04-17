@@ -45,14 +45,7 @@ sockaddr_cmp(struct sockaddr * x, struct sockaddr * y)
 
     CMP(x->sa_family, y->sa_family);
 
-    if (x->sa_family == AF_UNIX)
-    {
-        struct sockaddr_un *xun = (void *)x, *yun = (void *)y;
-        int                 r = strcmp(xun->sun_path, yun->sun_path);
-        if (r != 0)
-            return r;
-    }
-    else if (x->sa_family == AF_INET)
+    if (x->sa_family == AF_INET)
     {
         struct sockaddr_in *xin = (void *)x, *yin = (void *)y;
         CMP(ntohl(xin->sin_addr.s_addr), ntohl(yin->sin_addr.s_addr));
@@ -69,6 +62,15 @@ sockaddr_cmp(struct sockaddr * x, struct sockaddr * y)
         CMP(xin6->sin6_flowinfo, yin6->sin6_flowinfo);
         CMP(xin6->sin6_scope_id, yin6->sin6_scope_id);
     }
+#ifndef WIN32
+	else if (x->sa_family == AF_UNIX)
+	{
+		struct sockaddr_un *xun = (void *)x, *yun = (void *)y;
+		int                 r = strcmp(xun->sun_path, yun->sun_path);
+		if (r != 0)
+			return r;
+	}
+#endif
     else
     {
         assert(!"unknown sa_family");

@@ -22,6 +22,16 @@ main(int argc, char ** argv)
 
     srand((uint32_t)time(0));
 
+#ifdef WIN32
+	int wsa_ret;
+	WSADATA wsaData;
+	if (0 != (wsa_ret = WSAStartup(MAKEWORD(2, 2), &wsaData)))
+	{
+		fprintf("WSAStartup failed: %d", wsa_ret);
+		goto error_wsa;
+	}
+#endif 
+
     if (0 > SDL_Init(SDL_INIT_EVERYTHING))
     {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
@@ -168,6 +178,14 @@ error_sdl:
     SDL_DestroyRenderer(g_renderer);
     SDL_DestroyWindow(g_window);
     SDL_Quit();
+
+#ifdef WIN32
+
+error_wsa:
+
+	WSACleanup();
+
+#endif
 
     return retval;
 }
