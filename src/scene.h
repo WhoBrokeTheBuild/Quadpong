@@ -3,6 +3,9 @@
 
 #include "quadpong.h"
 
+#include "game_time.h"
+
+typedef struct scene scene_t;
 typedef struct scene
 {
     void (*start)(scene_t *);
@@ -12,15 +15,14 @@ typedef struct scene
     void (*update)(scene_t *, SDL_Event *, game_time_t *);
     void (*render)(scene_t *);
 
-    scene_t * prev;
-}
-scene_t;
+    scene_t *prev;
+} scene_t;
 
-void scene_init(scene_t * scn);
-void scene_switch(scene_t * scn);
-void scene_push(scene_t * scn);
+void scene_init(scene_t *scn);
+void scene_switch(scene_t *scn);
+void scene_push(scene_t *scn);
 void scene_pop();
 
-extern scene_t * g_cur_scene;
+extern scene_t *g_cur_scene;
 
 #endif // QUADPONG_SCENE_H

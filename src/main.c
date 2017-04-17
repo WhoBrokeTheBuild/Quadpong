@@ -1,23 +1,23 @@
+#include "game_time.h"
+#include "menu_scene.h"
 #include "quadpong.h"
 #include "util.h"
-#include "menu_scene.h"
-#include "game_time.h"
 
-SDL_Window      * g_window = NULL;
-SDL_Renderer    * g_renderer = NULL;
+SDL_Window *g_window = NULL;
+SDL_Renderer *g_renderer = NULL;
 
-TTF_Font * g_fnt_large = NULL;
-TTF_Font * g_fnt_small = NULL;
+TTF_Font *g_fnt_large = NULL;
+TTF_Font *g_fnt_small = NULL;
 
-bool g_running  = true;
-bool g_cap_fps  = true;
+bool g_running = true;
+bool g_cap_fps = true;
 bool g_show_fps = false;
-int g_max_fps   = 60;
+int g_max_fps = 60;
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
-    int             retval = 0;
-    menu_scene_t    menu_scene;
+    int retval = 0;
+    menu_scene_t menu_scene;
 
     srand((uint32_t)time(0));
 
@@ -64,24 +64,24 @@ int main(int argc, char ** argv)
     scene_switch((scene_t *)&menu_scene);
 
     game_time_t gt;
-    gt.delta   = 0.0f;
+    gt.delta = 0.0f;
     gt.elapsed = 0.0f;
-    gt.total   = 0.0f;
+    gt.total = 0.0f;
 
     clock_t start;
     clock_t diff;
     double frame_delay = 0.0;
-    double fps_delay   = 250.0;
-    double frame_elap  = 0.0;
-    double fps_elap    = 0.0;
-    long frames        = 0;
+    double fps_delay = 250.0;
+    double frame_elap = 0.0;
+    double fps_elap = 0.0;
+    long frames = 0;
     char fps_buffer[10];
     char title_buffer[30];
 
-    vec2f_t fps_pos = { 0, 0 };
+    vec2f_t fps_pos = {0, 0};
     sprite_text_t fps_disp;
     sprite_text_init(&fps_disp, g_fnt_small, "0.00");
-	sprite_text_set_fast(&fps_disp, true);
+    sprite_text_set_fast(&fps_disp, true);
     sprite_text_set_pos(&fps_disp, fps_pos);
 
     SDL_Event ev;
@@ -89,7 +89,7 @@ int main(int argc, char ** argv)
     while (g_running)
     {
         start = clock();
-    
+
         SDL_PollEvent(&ev);
         if (SDL_QUIT == ev.type)
         {
@@ -106,7 +106,7 @@ int main(int argc, char ** argv)
             ++frames;
             frame_elap = 0.0;
 
-            SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 255); 
+            SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 255);
             SDL_RenderClear(g_renderer);
 
             if (g_show_fps)
@@ -134,13 +134,13 @@ int main(int argc, char ** argv)
                 snprintf(fps_buffer, sizeof(fps_buffer), "%.2f", gt.fps);
                 sprite_text_set_text(&fps_disp, fps_buffer);
             }
-            
+
             snprintf(title_buffer, sizeof(title_buffer), GAME_TITLE " - %.2f", gt.fps);
             SDL_SetWindowTitle(g_window, title_buffer);
         }
 
         diff = clock() - start;
-        
+
         gt.elapsed = (diff * 1000.0) / CLOCKS_PER_SEC;
         gt.total += gt.elapsed;
         gt.delta = (float)(gt.elapsed / frame_delay);

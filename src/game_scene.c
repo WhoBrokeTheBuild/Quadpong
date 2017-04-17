@@ -1,36 +1,21 @@
 #include "game_scene.h"
-#include "game_time.h"
 #include "ball.h"
+#include "game_time.h"
 #include "player.h"
 
-area_t area_opts[] =
-{
-    AREA_LEFT,
-    AREA_RIGHT,
-    AREA_TOP,
-    AREA_BOTTOM
+area_t area_opts[] = {AREA_LEFT, AREA_RIGHT, AREA_TOP, AREA_BOTTOM};
+
+SDL_Keycode key_opts[][2] = {
+    {SDLK_s, SDLK_w}, {SDLK_DOWN, SDLK_UP}, {SDLK_d, SDLK_a}, {SDLK_RIGHT, SDLK_LEFT},
 };
 
-SDL_Keycode key_opts[][2] =
-{
-    { SDLK_s,	  SDLK_w },
-    { SDLK_DOWN,  SDLK_UP },
-    { SDLK_d,     SDLK_a },
-    { SDLK_RIGHT, SDLK_LEFT },
-};
+SDL_Color color_opts[] = {{255, 0, 0, 255}, {0, 255, 0, 255}, {0, 0, 255, 255}, {255, 0, 255, 255}};
 
-SDL_Color color_opts[] = {
-    { 255,   0,   0, 255 },
-    {   0, 255,   0, 255 },
-    {   0,   0, 255, 255 },
-    { 255,   0, 255, 255 }
-};
-
-void game_scene_init_base(game_scene_t * gscn)
+void game_scene_init_base(game_scene_t *gscn)
 {
     assert(NULL != gscn);
 
-    scene_t * scn = (scene_t *)gscn;
+    scene_t *scn = (scene_t *)gscn;
     scene_init(scn);
 
     scn->start = &game_scene_start_cb;
@@ -48,7 +33,7 @@ void game_scene_init_base(game_scene_t * gscn)
     gscn->socket = 0;
     gscn->conn_players = 0;
 
-    vec2f_t msg_pos = { (WIN_WIDTH / 2), 150 };
+    vec2f_t msg_pos = {(WIN_WIDTH / 2), 150};
     sprite_text_init(&gscn->message, g_fnt_large, " ");
     sprite_text_set_align(&gscn->message, ALIGN_CENTER);
     sprite_text_set_pos(&gscn->message, msg_pos);
@@ -56,7 +41,7 @@ void game_scene_init_base(game_scene_t * gscn)
     flatcc_builder_init(&gscn->fbs);
 }
 
-void game_scene_init_local(game_scene_t * gscn, int num_players)
+void game_scene_init_local(game_scene_t *gscn, int num_players)
 {
     game_scene_init_base(gscn);
 
@@ -66,8 +51,8 @@ void game_scene_init_local(game_scene_t * gscn, int num_players)
     for (int i = 0; i < gscn->num_players; ++i)
     {
         gscn->players[i] = (player_t *)malloc(sizeof(local_player_t));
-        local_player_init((local_player_t *)gscn->players[i],
-            area_opts[i], color_opts[i], key_opts[i][0], key_opts[i][1]);
+        local_player_init((local_player_t *)gscn->players[i], area_opts[i], color_opts[i],
+                          key_opts[i][0], key_opts[i][1]);
     }
 
     gscn->state = GAME_STATE_STARTING;
@@ -75,14 +60,13 @@ void game_scene_init_local(game_scene_t * gscn, int num_players)
     game_scene_update_message(gscn);
 }
 
-void game_scene_init_host(game_scene_t * gscn, int num_players)
+void game_scene_init_host(game_scene_t *gscn, int num_players)
 {
     game_scene_init_base(gscn);
 
     int err;
     struct addrinfo hints;
-    struct addrinfo * result = NULL,
-                    * rptr = NULL;
+    struct addrinfo *result = NULL, *rptr = NULL;
 
     gscn->num_players = num_players;
     gscn->conn_players = 1;
@@ -114,9 +98,9 @@ void game_scene_init_host(game_scene_t * gscn, int num_players)
             break;
 
 #ifdef WIN32
-		closesocket(gscn->socket);
+        closesocket(gscn->socket);
 #else
-		close(gscn->socket);
+        close(gscn->socket);
 #endif
     }
 
@@ -129,11 +113,11 @@ void game_scene_init_host(game_scene_t * gscn, int num_players)
     freeaddrinfo(result);
 
     int optval = 1;
-    setsockopt(gscn->socket, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval , sizeof(int));
+    setsockopt(gscn->socket, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(int));
 
     gscn->players[0] = (player_t *)malloc(sizeof(local_player_t));
-    local_player_init((local_player_t *)gscn->players[0],
-        area_opts[0], color_opts[0], key_opts[0][0], key_opts[0][1]);
+    local_player_init((local_player_t *)gscn->players[0], area_opts[0], color_opts[0],
+                      key_opts[0][0], key_opts[0][1]);
 
     gscn->state = GAME_STATE_WAITING_FOR_PLAYERS;
     game_scene_update_message(gscn);
@@ -144,23 +128,22 @@ error_socket:
 
     freeaddrinfo(result);
 #ifdef WIN32
-	closesocket(gscn->socket);
+    closesocket(gscn->socket);
 #else
-	close(gscn->socket);
+    close(gscn->socket);
 #endif
     gscn->socket = 0;
 
     scene_pop();
 }
 
-void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
+void game_scene_init_connect(game_scene_t *gscn, const char *hostname)
 {
     game_scene_init_base(gscn);
 
     int err;
     struct addrinfo hints;
-    struct addrinfo * result = NULL,
-                    * rptr = NULL;
+    struct addrinfo *result = NULL, *rptr = NULL;
 
     gscn->host = false;
     gscn->num_players = 0;
@@ -191,9 +174,9 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
             break;
 
 #ifdef WIN32
-		closesocket(gscn->socket);
+        closesocket(gscn->socket);
 #else
-		close(gscn->socket);
+        close(gscn->socket);
 #endif
     }
 
@@ -210,7 +193,7 @@ void game_scene_init_connect(game_scene_t * gscn, const char * hostname)
     p_welcome_packet_end_as_root(&gscn->fbs);
 
     size_t size;
-    uint8_t * buf = flatcc_builder_finalize_aligned_buffer(&gscn->fbs, &size);
+    uint8_t *buf = flatcc_builder_finalize_aligned_buffer(&gscn->fbs, &size);
 
     if ((ssize_t)size > send(gscn->socket, buf, size, 0))
     {
@@ -224,23 +207,23 @@ error_socket:
 
     freeaddrinfo(result);
 #ifdef WIN32
-	closesocket(gscn->socket);
+    closesocket(gscn->socket);
 #else
-	close(gscn->socket);
+    close(gscn->socket);
 #endif
     gscn->socket = 0;
 
     scene_pop();
 }
 
-void game_scene_cleanup_cb(scene_t * scn)
+void game_scene_cleanup_cb(scene_t *scn)
 {
-    game_scene_t * gscn = (game_scene_t *)scn;
+    game_scene_t *gscn = (game_scene_t *)scn;
 
 #ifdef WIN32
-	closesocket(gscn->socket);
+    closesocket(gscn->socket);
 #else
-	close(gscn->socket);
+    close(gscn->socket);
 #endif
     flatcc_builder_clear(&gscn->fbs);
 
@@ -260,9 +243,9 @@ void game_scene_cleanup_cb(scene_t * scn)
     free(gscn->ball);
 }
 
-void game_scene_start_cb(scene_t * scn)
+void game_scene_start_cb(scene_t *scn)
 {
-    game_scene_t * gscn = (game_scene_t *)scn;
+    game_scene_t *gscn = (game_scene_t *)scn;
 
     if (GAME_STATE_PAUSED == gscn->state)
     {
@@ -270,9 +253,9 @@ void game_scene_start_cb(scene_t * scn)
     }
 }
 
-void game_scene_stop_cb(scene_t * scn)
+void game_scene_stop_cb(scene_t *scn)
 {
-    game_scene_t * gscn = (game_scene_t *)scn;
+    game_scene_t *gscn = (game_scene_t *)scn;
 
     if (GAME_STATE_PLAYING == gscn->state)
     {
@@ -280,9 +263,9 @@ void game_scene_stop_cb(scene_t * scn)
     }
 }
 
-void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
+void game_scene_update_cb(scene_t *scn, SDL_Event *ev, game_time_t *gt)
 {
-    game_scene_t * gscn = (game_scene_t *)scn;
+    game_scene_t *gscn = (game_scene_t *)scn;
 
     if (0 != gscn->socket)
     {
@@ -311,8 +294,8 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
 
             for (int i = 1; i < gscn->conn_players; ++i)
             {
-                player_t * ply = gscn->players[i];
-                network_player_t * nply = (network_player_t *)ply;
+                player_t *ply = gscn->players[i];
+                network_player_t *nply = (network_player_t *)ply;
 
                 nply->ttl -= gt->elapsed;
                 if (0 >= nply->ttl)
@@ -355,9 +338,9 @@ void game_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
     }
 }
 
-void game_scene_render_cb(scene_t * scn)
+void game_scene_render_cb(scene_t *scn)
 {
-    game_scene_t * gscn = (game_scene_t *)scn;
+    game_scene_t *gscn = (game_scene_t *)scn;
 
     if (gscn->state != GAME_STATE_PLAYING)
     {
@@ -378,14 +361,15 @@ void game_scene_render_cb(scene_t * scn)
     ball_render(gscn->ball);
 }
 
-void game_scene_update_message(game_scene_t * gscn)
+void game_scene_update_message(game_scene_t *gscn)
 {
     gscn->message_buf[0] = ' ';
     gscn->message_buf[1] = '\0';
 
     if (GAME_STATE_WAITING_FOR_PLAYERS == gscn->state)
     {
-        snprintf(gscn->message_buf, sizeof(gscn->message_buf), "Waiting for %d players", (gscn->num_players - gscn->conn_players));
+        snprintf(gscn->message_buf, sizeof(gscn->message_buf), "Waiting for %d players",
+                 (gscn->num_players - gscn->conn_players));
     }
     else if (GAME_STATE_CONNECTING == gscn->state)
     {
@@ -393,13 +377,14 @@ void game_scene_update_message(game_scene_t * gscn)
     }
     else if (GAME_STATE_STARTING == gscn->state)
     {
-        snprintf(gscn->message_buf, sizeof(gscn->message_buf), "Starting in %d", ((int)gscn->start_delay / 1000));
+        snprintf(gscn->message_buf, sizeof(gscn->message_buf), "Starting in %d",
+                 ((int)gscn->start_delay / 1000));
     }
 
     sprite_text_set_text(&gscn->message, gscn->message_buf);
 }
 
-void game_scene_handle_packet(game_scene_t * gscn)
+void game_scene_handle_packet(game_scene_t *gscn)
 {
     int bytes_read;
     char buffer[4096];
@@ -407,7 +392,8 @@ void game_scene_handle_packet(game_scene_t * gscn)
     socklen_t addrlen;
     addrlen = sizeof(addr);
 
-    bytes_read = recvfrom(gscn->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addrlen);
+    bytes_read =
+        recvfrom(gscn->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addrlen);
 
     if (0 > bytes_read)
     {
@@ -426,7 +412,8 @@ void game_scene_handle_packet(game_scene_t * gscn)
         // TODO: Assign to player
 
         char tmp[] = "pong";
-        if ((ssize_t)sizeof(tmp) > sendto(gscn->socket, tmp, sizeof(tmp), 0, (struct sockaddr *)&addr, addrlen))
+        if ((ssize_t)sizeof(tmp) >
+            sendto(gscn->socket, tmp, sizeof(tmp), 0, (struct sockaddr *)&addr, addrlen))
         {
             fprintf(stderr, "Failed to send data to client\n");
             return;
@@ -436,7 +423,7 @@ void game_scene_handle_packet(game_scene_t * gscn)
         ++gscn->conn_players;
 
         gscn->players[player_ind] = (player_t *)malloc(sizeof(network_player_t));
-        network_player_t * nply = (network_player_t *)gscn->players[player_ind];
+        network_player_t *nply = (network_player_t *)gscn->players[player_ind];
         network_player_init(nply, area_opts[player_ind], color_opts[player_ind], &addr, addrlen);
 
         ++gscn->conn_players;
@@ -448,35 +435,31 @@ void game_scene_handle_packet(game_scene_t * gscn)
     }
 }
 
-void game_scene_send_updates(game_scene_t * gscn)
+void game_scene_send_updates(game_scene_t *gscn)
 {
     size_t size;
-    uint8_t * buf = NULL;
+    uint8_t *buf = NULL;
 
     p_update_packet_start_as_root(&gscn->fbs);
     p_update_packet_state_add(&gscn->fbs, (p_game_state_enum_t)gscn->state);
 
-	vec2f_t pos = ball_get_pos(gscn->ball);
-	vec2f_t vel = ball_get_vel(gscn->ball);
-	color_t color = ball_get_color(gscn->ball);
+    vec2f_t pos = ball_get_pos(gscn->ball);
+    vec2f_t vel = ball_get_vel(gscn->ball);
+    color_t color = ball_get_color(gscn->ball);
     // TODO: Move?
-    p_update_packet_ball_create(&gscn->fbs,
-        pos.x, pos.y, vel.x, vel.y,
-        color.r, color.g, color.b);
+    p_update_packet_ball_create(&gscn->fbs, pos.x, pos.y, vel.x, vel.y, color.r, color.g, color.b);
 
     for (int i = 1; i < gscn->conn_players; ++i)
     {
-        player_t * ply = gscn->players[i];
-        network_player_t * nply = (network_player_t *)ply;
+        player_t *ply = gscn->players[i];
+        network_player_t *nply = (network_player_t *)ply;
 
-		pos = player_get_pos(ply);
-		vel = player_get_vel(ply);
-		color = player_get_color(ply);
+        pos = player_get_pos(ply);
+        vel = player_get_vel(ply);
+        color = player_get_color(ply);
 
-		p_update_packet_players_push_create(&gscn->fbs,
-			pos.x, pos.y, vel.x, vel.y,
-			color.r, color.g, color.b,
-            (p_area_enum_t)player_get_area(ply));
+        p_update_packet_players_push_create(&gscn->fbs, pos.x, pos.y, vel.x, vel.y, color.r,
+                                            color.g, color.b, (p_area_enum_t)player_get_area(ply));
     }
 
     p_update_packet_end_as_root(&gscn->fbs);
@@ -485,8 +468,8 @@ void game_scene_send_updates(game_scene_t * gscn)
 
     for (int i = 1; i < gscn->conn_players; ++i)
     {
-        player_t * ply = gscn->players[i];
-        network_player_t * nply = (network_player_t *)ply;
+        player_t *ply = gscn->players[i];
+        network_player_t *nply = (network_player_t *)ply;
 
         if ((ssize_t)size > sendto(gscn->socket, buf, size, 0, &nply->addr, sizeof(nply->addr)))
         {

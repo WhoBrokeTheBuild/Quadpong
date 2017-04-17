@@ -1,0 +1,7 @@
+Language: Cpp
+Standard: Cpp11
+IndentWidth: 4
+TabWidth: 4
+AllowShortFunctionsOnASingleLine: false
+BreakBeforeBraces: Allman
+ColumnLimit: 100 

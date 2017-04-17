@@ -1,9 +1,9 @@
 #include "util.h"
 
-SDL_Texture * image_load(const char * filename, SDL_Renderer * ren)
+SDL_Texture *image_load(const char *filename, SDL_Renderer *ren)
 {
-    SDL_Surface * surf;
-    SDL_Texture * tex;
+    SDL_Surface *surf;
+    SDL_Texture *tex;
 
     printf("Loading texture %s\n", filename);
 
@@ -31,4 +31,3 @@ error:
 
     return tex;
 }
-
