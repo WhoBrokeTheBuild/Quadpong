@@ -525,6 +525,7 @@ game_scene_handle_packet(game_scene_t * gscn)
                 fprintf(stderr, "Failed to verify welcome packet: %s\n", flatcc_verify_error_string(ret));
                 return;
             }
+            printf("Received welcome packet\n");
 
             packet = fbs_welcome_packet_as_root(buffer);
             player = fbs_welcome_packet_player(packet);
@@ -542,6 +543,17 @@ game_scene_handle_packet(game_scene_t * gscn)
 
             local_player_init(lply, (area_t)area, tmp_color, key_opts[area][0], key_opts[area][1]);
 
+            area_t new_area = (area_t)0;
+            network_player_t * nply = NULL;
+            for (int i = 1; i < gscn->num_players; ++i)
+            {
+                if (new_area == area) new_area++;
+                gscn->players[i] = (player_t *)malloc(sizeof(network_player_t));
+                nply = (network_player_t *)gscn->players[i];
+                network_player_init(nply, new_area, color_opts[new_area], NULL, 0);
+                new_area++;
+            }
+
             gscn->state = GAME_STATE_WAITING_FOR_PLAYERS;
             game_scene_update_message(gscn);
         }
@@ -554,7 +566,43 @@ game_scene_handle_packet(game_scene_t * gscn)
                 fprintf(stderr, "Failed to verify packet: %s\n", flatcc_verify_error_string(ret));
             }
 
+            printf("Received server update packet\n");
             packet = fbs_server_update_packet_as_root(buffer);
+
+            player_t * ply = NULL;
+            fbs_player_vec_t players = fbs_server_update_packet_players(packet);
+            if (gscn->conn_players != fbs_player_vec_len(players))
+            {
+                gscn->conn_players = fbs_player_vec_len(players);
+                game_scene_update_message(gscn);
+            }
+
+            for (int i = 0; i < (int)fbs_player_vec_len(players); ++i)
+            {
+                fbs_player_struct_t player = fbs_player_vec_at(players, i);
+                ply = NULL;
+                for (int i = 1; i < gscn->num_players; ++i)
+                {
+                    if (fbs_player_area(player) == player_get_area(gscn->players[i]))
+                    {
+                        ply = gscn->players[i];
+                    }
+                }
+                if (NULL == ply) continue;
+
+                fbs_vec2f_struct_t pos = fbs_player_pos(player);
+                fbs_vec2f_struct_t vel = fbs_player_vel(player);
+                fbs_color_struct_t color = fbs_player_color(player);
+
+                player_set_pos(ply, (vec2f_t) { pos->x, pos->y });
+                player_set_vel(ply, (vec2f_t) { vel->x, vel->y });
+                player_set_color(ply, (color_t) { color->r, color->g, color->b, 255 });
+            }
+
+            if (gscn->conn_players == gscn->num_players)
+            {
+                gscn->state = GAME_STATE_STARTING;
+            }
         }
         else if (GAME_STATE_PLAYING)
         {
