@@ -29,6 +29,7 @@ typedef SSIZE_T ssize_t;
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 #define _strdup strdup
@@ -39,19 +40,19 @@ typedef SSIZE_T ssize_t;
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-typedef SDL_Rect rect_t;
+typedef SDL_Rect  rect_t;
 typedef SDL_Color color_t;
 
-extern SDL_Window *g_window;     /**< Global reference to the Window */
-extern SDL_Renderer *g_renderer; /**< Global reference to the Renderer */
+extern SDL_Window *   g_window;   /**< Global reference to the Window */
+extern SDL_Renderer * g_renderer; /**< Global reference to the Renderer */
 
-extern TTF_Font *g_fnt_large; /**< Global large font */
-extern TTF_Font *g_fnt_small; /**< Global small font */
+extern TTF_Font * g_fnt_large; /**< Global large font */
+extern TTF_Font * g_fnt_small; /**< Global small font */
 
 extern bool g_running;
 extern bool g_cap_fps;
 extern bool g_show_fps;
-extern int g_max_fps;
+extern int  g_max_fps;
 
 #define GAME_TITLE "Quadpong"
 
@@ -77,7 +78,7 @@ extern int g_max_fps;
 
 #define PORT "57664"
 #define UPDATE_DELAY (60)
-#define MAX_PLAYER_TTL (UPDATE_DELAY * 4)
+#define MAX_PLAYER_TTL (UPDATE_DELAY * 10)
 
 #define ASSET_PATH "assets/"
 #define PIXEL_ASSET_PATH ASSET_PATH "pixel.png"

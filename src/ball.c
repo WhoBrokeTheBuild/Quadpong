@@ -2,9 +2,10 @@
 #include "game_time.h"
 #include "player.h"
 
-void ball_init(ball_t *ball)
+void
+ball_init(ball_t * ball)
 {
-    object_t *obj = &ball->_base;
+    object_t * obj = &ball->_base;
     object_init(obj);
 
     sprite_create(object_get_sprite(obj), 1, 1, (color_t){255, 255, 255, 255});
@@ -19,17 +20,19 @@ void ball_init(ball_t *ball)
                  (vec2f_t){(WIN_WIDTH / 2) - (BALL_SIZE / 2), (WIN_HEIGHT / 2) - (BALL_SIZE / 2)});
 }
 
-void ball_cleanup(ball_t *ball)
+void
+ball_cleanup(ball_t * ball)
 {
-    object_t *obj = &ball->_base;
+    object_t * obj = &ball->_base;
     object_cleanup(obj);
 }
 
-void ball_update(ball_t *ball, struct player **players, game_time_t *gt)
+void
+ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
 {
-    object_t *obj = &ball->_base;
+    object_t * obj = &ball->_base;
 
-    vec2f_t vel = ball_get_vel(ball);
+    vec2f_t vel     = ball_get_vel(ball);
     vec2f_t tmp_pos = vec2f_add(ball_get_pos(ball), vec2f_muls(vel, gt->delta));
 
     vec2f_t ply_pos;
@@ -38,7 +41,7 @@ void ball_update(ball_t *ball, struct player **players, game_time_t *gt)
         if (NULL == players[i])
             break;
 
-        rect_t ball_rect = ball_get_bounding_box(ball);
+        rect_t ball_rect   = ball_get_bounding_box(ball);
         rect_t player_rect = player_get_bounding_box(players[i]);
         if (SDL_HasIntersection(&ball_rect, &player_rect))
         {
@@ -46,28 +49,17 @@ void ball_update(ball_t *ball, struct player **players, game_time_t *gt)
             ball_set_color(ball, player_get_color(players[i]));
             ply_pos = player_get_pos(players[i]);
 
-            float angle = 0.0f;
-            vec2f_t mod = { 1.0f, 1.0f };
-            if (AREA_LEFT == players[i]->_area)
+            float   angle = 0.0f;
+            vec2f_t mod   = {1.0f, 1.0f};
+            switch (player_get_area(players[i]))
             {
-                angle = sinf(((tmp_pos.y - ply_pos.y) / PLAYER_V_HEIGHT) * M_PI);
-            }
-            else if (AREA_RIGHT == players[i]->_area)
-            {
-                angle = sinf(((tmp_pos.y - ply_pos.y) / PLAYER_V_HEIGHT) * M_PI);
-                mod.x = -1.0f;
-            }
-            else if (AREA_TOP == players[i]->_area)
-            {
-                angle = sinf(((tmp_pos.x - ply_pos.x) / PLAYER_H_WIDTH) * M_PI);
-            }
-            else if (AREA_BOTTOM == players[i]->_area)
-            {
-                angle = sinf(((tmp_pos.x - ply_pos.x) / PLAYER_H_WIDTH) * M_PI);
-                mod.y = -1.0f;
+            case AREA_RIGHT: mod.x = -1.0f;
+            case AREA_LEFT: angle = sinf(((tmp_pos.y - ply_pos.y) / PLAYER_V_HEIGHT) * M_PI); break;
+            case AREA_BOTTOM: mod.y = -1.0f;
+            case AREA_TOP: angle = sinf(((tmp_pos.x - ply_pos.x) / PLAYER_H_WIDTH) * M_PI); break;
             }
 
-            vel = (vec2f_t){ cosf(angle) * BALL_SPEED * mod.x, sinf(angle) * BALL_SPEED * mod.y };
+            vel = (vec2f_t){cosf(angle) * BALL_SPEED * mod.x, sinf(angle) * BALL_SPEED * mod.y};
         }
     }
 

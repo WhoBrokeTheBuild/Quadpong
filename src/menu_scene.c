@@ -2,8 +2,11 @@
 #include "game_scene.h"
 #include "sprite.h"
 
-void menu_option_init(menu_option_t *opt, const char *text, void (*selected)(menu_scene_t *),
-                      vec2f_t pos)
+void
+menu_option_init(menu_option_t * opt,
+                 const char *    text,
+                 void (*selected)(menu_scene_t *),
+                 vec2f_t pos)
 {
     assert(NULL != opt);
 
@@ -14,11 +17,12 @@ void menu_option_init(menu_option_t *opt, const char *text, void (*selected)(men
     sprite_text_set_pos(&opt->sprite, pos);
 
     opt->num_options = 0;
-    opt->selected = selected;
-    opt->options = NULL;
+    opt->selected    = selected;
+    opt->options     = NULL;
 }
 
-void menu_option_cleanup(menu_option_t *opt)
+void
+menu_option_cleanup(menu_option_t * opt)
 {
     sprite_text_cleanup(&opt->sprite);
 
@@ -29,8 +33,11 @@ void menu_option_cleanup(menu_option_t *opt)
     free(opt->options);
 }
 
-menu_option_t *menu_option_add_sub_option(menu_option_t *opt, const char *text,
-                                          void (*selected)(menu_scene_t *), vec2f_t pos)
+menu_option_t *
+menu_option_add_sub_option(menu_option_t * opt,
+                           const char *    text,
+                           void (*selected)(menu_scene_t *),
+                           vec2f_t pos)
 {
     assert(NULL != opt);
 
@@ -42,12 +49,14 @@ menu_option_t *menu_option_add_sub_option(menu_option_t *opt, const char *text,
     return &opt->options[opt->num_options - 1];
 }
 
-void option_quit_cb(menu_scene_t *mscn)
+void
+option_quit_cb(menu_scene_t * mscn)
 {
     g_running = false;
 }
 
-void option_local_game_cb(menu_scene_t *mscn)
+void
+option_local_game_cb(menu_scene_t * mscn)
 {
     mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
     game_scene_init_local(mscn->game_scene, 2);
@@ -55,7 +64,8 @@ void option_local_game_cb(menu_scene_t *mscn)
     scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_host_two_game_cb(menu_scene_t *mscn)
+void
+option_host_two_game_cb(menu_scene_t * mscn)
 {
     mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
     game_scene_init_host(mscn->game_scene, 2);
@@ -63,7 +73,8 @@ void option_host_two_game_cb(menu_scene_t *mscn)
     scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_host_four_game_cb(menu_scene_t *mscn)
+void
+option_host_four_game_cb(menu_scene_t * mscn)
 {
     mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
     game_scene_init_host(mscn->game_scene, 4);
@@ -71,7 +82,8 @@ void option_host_four_game_cb(menu_scene_t *mscn)
     scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_connect_game_cb(menu_scene_t *mscn)
+void
+option_connect_game_cb(menu_scene_t * mscn)
 {
     mscn->game_scene = (game_scene_t *)malloc(sizeof(game_scene_t));
     game_scene_init_connect(mscn->game_scene, "127.0.0.1");
@@ -79,28 +91,31 @@ void option_connect_game_cb(menu_scene_t *mscn)
     scene_push((scene_t *)mscn->game_scene);
 }
 
-void option_toggle_cap_fps_cb(menu_scene_t *mscn)
+void
+option_toggle_cap_fps_cb(menu_scene_t * mscn)
 {
     g_cap_fps = !g_cap_fps;
 }
 
-void option_toggle_show_fps_cb(menu_scene_t *mscn)
+void
+option_toggle_show_fps_cb(menu_scene_t * mscn)
 {
     g_show_fps = !g_show_fps;
 }
 
-void menu_scene_init(menu_scene_t *mscn)
+void
+menu_scene_init(menu_scene_t * mscn)
 {
     assert(NULL != mscn);
 
-    scene_t *scn = (scene_t *)mscn;
+    scene_t * scn = (scene_t *)mscn;
     scene_init(scn);
 
-    scn->start = &menu_scene_start_cb;
-    scn->stop = &menu_scene_stop_cb;
+    scn->start   = &menu_scene_start_cb;
+    scn->stop    = &menu_scene_stop_cb;
     scn->cleanup = &menu_scene_cleanup_cb;
-    scn->update = &menu_scene_update_cb;
-    scn->render = &menu_scene_render_cb;
+    scn->update  = &menu_scene_update_cb;
+    scn->render  = &menu_scene_render_cb;
 
     mscn->game_scene = NULL;
 
@@ -110,8 +125,8 @@ void menu_scene_init(menu_scene_t *mscn)
     sprite_create(&mscn->arrow, 1, 1, (color_t){255, 255, 255, 255});
     sprite_set_size(&mscn->arrow, (vec2_t){20, 20});
 
-    menu_option_t *menu_ptr;
-    vec2f_t root_mpos = {50, 150};
+    menu_option_t * menu_ptr;
+    vec2f_t         root_mpos = {50, 150};
     menu_option_init(&mscn->root_option_group, NULL, NULL, root_mpos);
 
     menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Local Game",
@@ -144,9 +159,10 @@ void menu_scene_init(menu_scene_t *mscn)
     root_mpos.y += MENU_OPTION_HEIGHT;
 }
 
-void menu_scene_cleanup_cb(scene_t *scn)
+void
+menu_scene_cleanup_cb(scene_t * scn)
 {
-    menu_scene_t *mscn = (menu_scene_t *)scn;
+    menu_scene_t * mscn = (menu_scene_t *)scn;
 
     menu_option_cleanup(&mscn->root_option_group);
 
@@ -154,12 +170,13 @@ void menu_scene_cleanup_cb(scene_t *scn)
     sprite_cleanup(&mscn->arrow);
 }
 
-void menu_scene_start_cb(scene_t *scn)
+void
+menu_scene_start_cb(scene_t * scn)
 {
-    menu_scene_t *mscn = (menu_scene_t *)scn;
+    menu_scene_t * mscn = (menu_scene_t *)scn;
 
-    mscn->menu_ind = 0;
-    mscn->input_wait = false;
+    mscn->menu_ind         = 0;
+    mscn->input_wait       = false;
     mscn->cur_option_group = &mscn->root_option_group;
 
     if (NULL != mscn->game_scene)
@@ -169,13 +186,15 @@ void menu_scene_start_cb(scene_t *scn)
     }
 }
 
-void menu_scene_stop_cb(scene_t *scn)
+void
+menu_scene_stop_cb(scene_t * scn)
 {
 }
 
-void menu_scene_update_cb(scene_t *scn, SDL_Event *ev, game_time_t *gt)
+void
+menu_scene_update_cb(scene_t * scn, SDL_Event * ev, game_time_t * gt)
 {
-    menu_scene_t *mscn = (menu_scene_t *)scn;
+    menu_scene_t * mscn = (menu_scene_t *)scn;
 
     if (NULL == mscn->cur_option_group)
     {
@@ -216,15 +235,15 @@ void menu_scene_update_cb(scene_t *scn, SDL_Event *ev, game_time_t *gt)
         {
             if (!mscn->input_wait)
             {
-                mscn->input_wait = true;
-                menu_option_t *opt = &mscn->cur_option_group->options[mscn->menu_ind];
+                mscn->input_wait    = true;
+                menu_option_t * opt = &mscn->cur_option_group->options[mscn->menu_ind];
                 if (NULL != opt->selected)
                 {
                     opt->selected(mscn);
                 }
                 else
                 {
-                    mscn->menu_ind = 0;
+                    mscn->menu_ind         = 0;
                     mscn->cur_option_group = opt;
                 }
             }
@@ -236,7 +255,7 @@ void menu_scene_update_cb(scene_t *scn, SDL_Event *ev, game_time_t *gt)
                 mscn->input_wait = true;
                 if (NULL != mscn->cur_option_group->parent)
                 {
-                    mscn->menu_ind = 0;
+                    mscn->menu_ind         = 0;
                     mscn->cur_option_group = mscn->cur_option_group->parent;
                 }
             }
@@ -248,9 +267,10 @@ void menu_scene_update_cb(scene_t *scn, SDL_Event *ev, game_time_t *gt)
     }
 }
 
-void menu_scene_render_cb(scene_t *scn)
+void
+menu_scene_render_cb(scene_t * scn)
 {
-    menu_scene_t *mscn = (menu_scene_t *)scn;
+    menu_scene_t * mscn = (menu_scene_t *)scn;
 
     sprite_render(&mscn->title);
     sprite_render(&mscn->arrow);

@@ -5,8 +5,8 @@
 
 typedef struct game_time
 {
-    float fps;
-    float delta;
+    float  fps;
+    float  delta;
     double elapsed;
     double total;
 } game_time_t;

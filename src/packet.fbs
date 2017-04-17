@@ -1,22 +1,24 @@
 
-struct p_vec2 {
+namespace fbs;
+
+struct vec2f {
     x:float;
     y:float;
 }
 
-struct p_color {
+struct color {
     r:ushort;
     g:ushort;
     b:ushort;
 }
 
-struct p_ball {
-    pos:p_vec2;
-    vel:p_vec2;
-    color:p_color;
+struct ball {
+    pos:vec2f;
+    vel:vec2f;
+    color:color;
 }
 
-enum p_area:ushort {
+enum area:ushort {
     invalid = 0,
     top    = 1,
     bottom = 2,
@@ -24,7 +26,7 @@ enum p_area:ushort {
     right  = 4,
 }
 
-enum p_game_state:ushort {
+enum game_state:ushort {
     invalid = 0,
     waiting_for_players = 1,
     connecting          = 2,
@@ -33,23 +35,28 @@ enum p_game_state:ushort {
     paused              = 5,
 }
 
-struct p_player {
-    pos:p_vec2;
-    vel:p_vec2;
-    color:p_color;
-    area:p_area;
+struct player {
+    pos:vec2f;
+    vel:vec2f;
+    color:color;
+    area:area;
 }
 
-table p_join_packet {
+table join_packet {
 
 }
 
-table p_welcome_packet {
-    player:p_player;
+table welcome_packet {
+    num_players:ushort;
+    player:player;
 }
 
-table p_update_packet {
-    state:p_game_state;
-    ball:p_ball;
-    players:[p_player];
+table client_update_packet {
+    player:player;
+}
+
+table server_update_packet {
+    state:game_state;
+    ball:ball;
+    players:[player];
 }

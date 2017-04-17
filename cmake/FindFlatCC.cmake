@@ -44,39 +44,39 @@ set(FLATCC_SEARCH_PATHS
 
 set(FLATCC_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-find_path(FLATCC_INCLUDE_DIR 
+find_path(FLATCC_INCLUDE_DIR
 	NAMES flatcc/flatcc.h
 	HINTS
 	PATH_SUFFIXES include
 	PATHS ${FLATCC_SEARCH_PATHS}
 )
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8) 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(PATH_SUFFIXES lib64 lib/x64 lib/amd64 lib)
-else() 
+else()
 	set(PATH_SUFFIXES lib/x86 lib)
-endif() 
+endif()
 
-find_library(FLATCC_LIBRARY 
+find_library(FLATCC_LIBRARY
 	NAMES flatcc
 	HINTS
 	PATH_SUFFIXES ${PATH_SUFFIXES}
 	PATHS ${FLATCC_SEARCH_PATHS}
 )
-find_library(FLATCC_RUNTIME_LIBRARY 
+find_library(FLATCC_RUNTIME_LIBRARY
 	NAMES flatccrt
 	HINTS
 	PATH_SUFFIXES ${PATH_SUFFIXES}
 	PATHS ${FLATCC_SEARCH_PATHS}
 )
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8) 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(PATH_SUFFIXES bin/amd64 bin)
-else() 
+else()
 	set(PATH_SUFFIXES bin)
-endif() 
+endif()
 
-find_program(FLATCC_FLATC_EXECUTABLE 
+find_program(FLATCC_FLATC_EXECUTABLE
 	NAMES flatcc
 	HINTS
 	PATH_SUFFIXES ${PATH_SUFFIXES}
@@ -89,8 +89,8 @@ find_package_handle_standard_args(flatcc
 
 if(FLATCC_FOUND)
 	function(FLATCC_GENERATE_C_HEADERS Name)
-		set(FLATCC_COMMON 
-			"${CMAKE_CURRENT_BINARY_DIR}/flatbuffers_common_reader.h" 
+		set(FLATCC_COMMON
+			"${CMAKE_CURRENT_BINARY_DIR}/flatbuffers_common_reader.h"
 			"${CMAKE_CURRENT_BINARY_DIR}/flatbuffers_common_builder.h"
 		)
 		add_custom_command(OUTPUT ${FLATCC_COMMON}
@@ -110,7 +110,7 @@ if(FLATCC_FOUND)
 			add_custom_command(OUTPUT ${FLATCC_OUTPUT}
 				DEPENDS ${FILE}
 				COMMAND ${FLATCC_FLATC_EXECUTABLE}
-				ARGS -w -o "${CMAKE_CURRENT_BINARY_DIR}/" ${FILE}
+				ARGS -wv -o "${CMAKE_CURRENT_BINARY_DIR}/" ${FILE}
 				COMMENT "Building C header for ${FILE}"
 				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 		endforeach()
