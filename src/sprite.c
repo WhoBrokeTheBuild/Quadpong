@@ -1,122 +1,127 @@
 #include "sprite.h"
 
-bool sprite_init(sprite_t * spr, const char * filename)
+void _sprite_apply_align(sprite_t * spr);
+void _sprite_apply_color(sprite_t * spr);
+
+void sprite_init(sprite_t * spr)
 {
-    assert(NULL != spr);
+	spr->_texture = NULL;
+	spr->_src = (rect_t) { 0, 0, 0, 0 };
+	spr->_dst = (rect_t) { 0, 0, 0, 0 };
+	spr->_pos = (vec2f_t) { 0.0f, 0.0f };
+	spr->_color = (color_t) { 255, 255, 255, 255 };
+	spr->_align = ALIGN_TOP_LEFT;
+}
 
-    int w, h;
-    spr->texture = image_load(filename, g_renderer);
+bool sprite_load_file(sprite_t * spr, const char * filename)
+{
+	int w, h;
 
-    if (NULL == spr->texture)
+	spr->_pos = (vec2f_t) { 0.0f, 0.0f };
+	spr->_color = (color_t) { 255, 255, 255, 255 };
+	spr->_align = ALIGN_TOP_LEFT;
+
+	spr->_texture = image_load(filename, g_renderer);
+    if (NULL == spr->_texture)
     {
         return false;
     }
 
-    SDL_QueryTexture(spr->texture, NULL, NULL, &w, &h);
+	SDL_QueryTexture(spr->_texture, NULL, NULL, &w, &h);
+	spr->_src = (rect_t) { 0, 0, w, h };
+	spr->_dst = (rect_t) { 0, 0, w, h };
 
-    spr->align = SPRITE_ALIGN_TOP_LEFT;
-    spr->src_rect.w = spr->dst_rect.w = w;
-    spr->src_rect.h = spr->dst_rect.h = h;
-    spr->src_rect.x = spr->src_rect.y = 0;
-    spr->dst_rect.x = spr->dst_rect.y = 0;
+	_sprite_apply_align(spr);
+	_sprite_apply_color(spr);
 
     return true;
 }
 
-void sprite_cleanup(sprite_t * spr)
+bool sprite_create(sprite_t * spr, int w, int h, color_t color)
 {
-    if (NULL == spr) return;
+	uint8_t pixel[] = { 255, 255, 255, 255 };
+	spr->_texture = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, w, h);
+	if (NULL == spr->_texture)
+	{
+		return false;
+	}
+	SDL_UpdateTexture(spr->_texture, NULL, &pixel, sizeof(pixel));
 
-    SDL_DestroyTexture(spr->texture);
+	spr->_pos = (vec2f_t) { 0.0f, 0.0f };
+	spr->_color = (color_t) { 255, 255, 255, 255 };
+	spr->_align = ALIGN_TOP_LEFT;
+
+	spr->_src = (rect_t) { 0, 0, w, h };
+	spr->_dst = (rect_t) { 0, 0, w, h };
+
+	_sprite_apply_align(spr);
+	_sprite_apply_color(spr);
+
+	return true;
+}
+
+void sprite_cleanup(sprite_t * spr)
+{	
+	if (NULL != spr->_texture)
+	{
+		SDL_DestroyTexture(spr->_texture);
+		spr->_texture = NULL;
+	}
 }
 
 void sprite_render(sprite_t * spr)
 {
-    assert(NULL != spr);
-
-    if (NULL != spr->texture)
+    if (NULL != spr->_texture)
     {
-        SDL_RenderCopy(g_renderer, spr->texture, &spr->src_rect, &spr->dst_rect);
+        SDL_RenderCopy(g_renderer, spr->_texture, &spr->_src, &spr->_dst);
     }
 }
 
-void sprite_calc_align(sprite_t * spr)
+void sprite_set_align(sprite_t * spr, align_t align)
 {
-    assert(NULL != spr);
-
-    if (SPRITE_ALIGN_TOP_LEFT == spr->align)
-    {
-        spr->dst_rect.x = (int)spr->pos.x;
-        spr->dst_rect.y = (int)spr->pos.y;
-    }
-    else if (SPRITE_ALIGN_CENTER == spr->align)
-    {
-        spr->dst_rect.x = (int)spr->pos.x - (spr->dst_rect.w / 2);
-        spr->dst_rect.y = (int)spr->pos.y - (spr->dst_rect.h / 2);
-    }
-}
-
-void sprite_set_align(sprite_t * spr, sprite_align_t align)
-{
-    assert(NULL != spr);
-
-    spr->align = align;
-    sprite_calc_align(spr);
+	spr->_align = align;
+	_sprite_apply_align(spr);
 }
 
 void sprite_set_pos(sprite_t * spr, vec2f_t pos)
-{ 
-    assert(NULL != spr);
-
-    spr->pos = pos;
-    sprite_calc_align(spr);
+{
+	spr->_pos = pos;
+	spr->_dst.x = (int)spr->_pos.x;
+	spr->_dst.y = (int)spr->_pos.y;
+	_sprite_apply_align(spr);
 }
 
-void sprite_text_init(sprite_text_t * tspr, TTF_Font * font, const char * text)
+void sprite_set_size(sprite_t * spr, vec2_t size)
 {
-    sprite_t * spr = (sprite_t *)tspr;
-
-    tspr->fast = false;
-    tspr->font = font;
-    spr->texture = NULL;
-    spr->align = SPRITE_ALIGN_TOP_LEFT;
-    sprite_text_set_text(tspr, text);
-
-    spr->src_rect.x = spr->src_rect.y = 0;
-    spr->dst_rect.x = spr->dst_rect.y = 0;
+	spr->_dst.w = size.x;
+	spr->_dst.h = size.y;
+	_sprite_apply_align(spr);
 }
 
-void sprite_text_set_text(sprite_text_t * tspr, const char * text)
+void sprite_set_color(sprite_t * spr, color_t color)
 {
-    sprite_t * spr = (sprite_t *)tspr;
+	spr->_color = color;
+	_sprite_apply_color(spr);
+}
 
-    SDL_Surface * surf;
-    SDL_Color color = { 255, 255, 255, 0 };
+void _sprite_apply_align(sprite_t * spr)
+{
+	if (ALIGN_TOP_LEFT == spr->_align)
+	{
+		spr->_dst.x = (int)spr->_pos.x;
+		spr->_dst.y = (int)spr->_pos.y;
+	}
+	else if (ALIGN_CENTER == spr->_align)
+	{
+		spr->_dst.x = (int)spr->_pos.x - (spr->_dst.w / 2);
+		spr->_dst.y = (int)spr->_pos.y - (spr->_dst.h / 2);
+	}
+}
 
-    if (NULL != spr->texture)
-    {
-        SDL_DestroyTexture(spr->texture);
-        spr->texture = NULL;
-    }
-
-    if (text == NULL)
-    {
-        return;
-    }
-
-    if (tspr->fast)
-    {
-        surf = TTF_RenderText_Solid(tspr->font, text, color);
-    }
-    else
-    {
-        surf = TTF_RenderText_Blended(tspr->font, text, color);
-    }
-    spr->texture = SDL_CreateTextureFromSurface(g_renderer, surf);
-
-    spr->src_rect.w = spr->dst_rect.w = surf->w;
-    spr->src_rect.h = spr->dst_rect.h = surf->h;
-    sprite_calc_align(spr);
-    
-    SDL_FreeSurface(surf);
+void _sprite_apply_color(sprite_t * spr)
+{
+	if (NULL != spr->_texture)
+	{
+		SDL_SetTextureColorMod(spr->_texture, spr->_color.r, spr->_color.g, spr->_color.b);
+	}
 }

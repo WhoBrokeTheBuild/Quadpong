@@ -81,7 +81,7 @@ int main(int argc, char ** argv)
     vec2f_t fps_pos = { 0, 0 };
     sprite_text_t fps_disp;
     sprite_text_init(&fps_disp, g_fnt_small, "0.00");
-    fps_disp.fast = true;
+	sprite_text_set_fast(&fps_disp, true);
     sprite_text_set_pos(&fps_disp, fps_pos);
 
     SDL_Event ev;

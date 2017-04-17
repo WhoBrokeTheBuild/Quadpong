@@ -3,7 +3,7 @@
 
 #include "quadpong.h"
 #include "scene.h"
-#include "sprite.h"
+#include "sprite_text.h"
 
 struct menu_scene;
 

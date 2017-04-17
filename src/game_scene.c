@@ -1,4 +1,5 @@
 #include "game_scene.h"
+#include "game_time.h"
 #include "ball.h"
 #include "player.h"
 
@@ -12,9 +13,9 @@ area_t area_opts[] =
 
 SDL_Keycode key_opts[][2] =
 {
-    { SDLK_s, SDLK_w },
-    { SDLK_DOWN, SDLK_UP },
-    { SDLK_d, SDLK_a },
+    { SDLK_s,	  SDLK_w },
+    { SDLK_DOWN,  SDLK_UP },
+    { SDLK_d,     SDLK_a },
     { SDLK_RIGHT, SDLK_LEFT },
 };
 
@@ -49,7 +50,7 @@ void game_scene_init_base(game_scene_t * gscn)
 
     vec2f_t msg_pos = { (WIN_WIDTH / 2), 150 };
     sprite_text_init(&gscn->message, g_fnt_large, " ");
-    sprite_text_set_align(&gscn->message, SPRITE_ALIGN_CENTER);
+    sprite_text_set_align(&gscn->message, ALIGN_CENTER);
     sprite_text_set_pos(&gscn->message, msg_pos);
 
     flatcc_builder_init(&gscn->fbs);
@@ -455,22 +456,27 @@ void game_scene_send_updates(game_scene_t * gscn)
     p_update_packet_start_as_root(&gscn->fbs);
     p_update_packet_state_add(&gscn->fbs, (p_game_state_enum_t)gscn->state);
 
+	vec2f_t pos = ball_get_pos(gscn->ball);
+	vec2f_t vel = ball_get_vel(gscn->ball);
+	color_t color = ball_get_color(gscn->ball);
     // TODO: Move?
     p_update_packet_ball_create(&gscn->fbs,
-        gscn->ball->pos.x, gscn->ball->pos.y,
-        gscn->ball->vel.x, gscn->ball->vel.y,
-        gscn->ball->color.r, gscn->ball->color.g, gscn->ball->color.b);
+        pos.x, pos.y, vel.x, vel.y,
+        color.r, color.g, color.b);
 
     for (int i = 1; i < gscn->conn_players; ++i)
     {
         player_t * ply = gscn->players[i];
         network_player_t * nply = (network_player_t *)ply;
 
-        p_update_packet_players_push_create(&gscn->fbs,
-            ply->pos.x, ply->pos.y,
-            ply->vel.x, ply->vel.y,
-            ply->color.r, ply->color.g, ply->color.b,
-            (p_area_enum_t)ply->area);
+		pos = player_get_pos(ply);
+		vel = player_get_vel(ply);
+		color = player_get_color(ply);
+
+		p_update_packet_players_push_create(&gscn->fbs,
+			pos.x, pos.y, vel.x, vel.y,
+			color.r, color.g, color.b,
+            (p_area_enum_t)player_get_area(ply));
     }
 
     p_update_packet_end_as_root(&gscn->fbs);

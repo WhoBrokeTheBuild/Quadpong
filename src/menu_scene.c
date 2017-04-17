@@ -9,6 +9,7 @@ void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(m
     opt->parent = NULL;
     
     sprite_text_init(&opt->sprite, g_fnt_large, text);
+	sprite_text_set_color(&opt->sprite, (color_t) { 255, 255, 255, 255 });
     sprite_text_set_pos(&opt->sprite, pos);
 
     opt->num_options = 0;
@@ -101,13 +102,11 @@ void menu_scene_init(menu_scene_t * mscn)
 
     mscn->game_scene = NULL;
 
-    vec2f_t title_pos = { 50, 50 };
-    sprite_init(&mscn->title, TITLE_ASSET_PATH);
-    sprite_set_pos(&mscn->title, title_pos);
+    sprite_load_file(&mscn->title, TITLE_ASSET_PATH);
+    sprite_set_pos(&mscn->title, (vec2f_t) { 50, 50 });
 
-    vec2_t arrow_size = { 20, 20 };
-    sprite_init(&mscn->arrow, PIXEL_ASSET_PATH);
-    sprite_set_size(&mscn->arrow, arrow_size);
+	sprite_create(&mscn->arrow, 1, 1, (color_t) { 255, 255, 255 });
+    sprite_set_size(&mscn->arrow, (vec2_t) { 20, 20 });
 
     menu_option_t * menu_ptr;
     vec2f_t root_mpos = { 50, 150 };

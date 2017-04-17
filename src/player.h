@@ -2,9 +2,7 @@
 #define QUADPONG_PLAYER_H
 
 #include "quadpong.h"
-#include "game_time.h"
-#include "sprite.h"
-#include "vec2.h"
+#include "object.h"
 
 typedef enum
 {
@@ -17,22 +15,32 @@ area_t;
 
 typedef struct player
 {
-    void (*cleanup)(struct player *);
-    void (*update)(struct player *, SDL_Event *, game_time_t *);
-    void (*render)(struct player *);
+	object_t base;
 
-    sprite_t * sprite;
-    SDL_Color color;
-    vec2f_t pos;
-    vec2f_t vel;
-    area_t area;
-    int score;
+    area_t _area;
+    int	   _score;
+
+	void(*cleanup)(player_t *);
+	void(*update)(player_t *, SDL_Event *, game_time_t *);
+	void(*render)(player_t *);
 }
 player_t;
 
 void player_init(player_t * ply, area_t area, SDL_Color color);
 void player_cleanup_cb(player_t * ply);
 void player_render_cb(player_t * ply);
+
+inline color_t player_get_color(player_t * player) { return object_get_color(&player->base); }
+inline void player_set_color(player_t * player, color_t color) { object_set_color(&player->base, color); }
+
+inline vec2f_t player_get_vel(player_t * player) { return object_get_vel(&player->base); }
+inline void player_set_vel(player_t * player, vec2f_t vel) { object_set_vel(&player->base, vel); }
+
+static inline vec2f_t player_get_pos(player_t * ply) { return object_get_pos(&ply->base); }
+static inline void player_set_pos(player_t * ply, vec2f_t pos) { object_set_pos(&ply->base, pos); }
+
+static inline area_t player_get_area(player_t * ply) { return ply->_area; }
+static inline SDL_Rect player_get_bounding_box(player_t * ply) { return object_get_bounding_box(&ply->base); }
 
 typedef struct local_player
 {

@@ -4,8 +4,6 @@ scene_t * g_cur_scene = NULL;
 
 void scene_init(scene_t * scn)
 {
-    assert(NULL != scn);
-
     scn->start = NULL;
     scn->stop = NULL;
     scn->cleanup = NULL;
@@ -32,8 +30,6 @@ void scene_switch(scene_t * scn)
 
 void scene_push(scene_t * scn)
 {
-    assert(NULL != scn);
-
     scn->prev = g_cur_scene;
     scene_switch(scn);
 }

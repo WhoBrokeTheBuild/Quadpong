@@ -23,24 +23,28 @@ SET(
 
 SET(
     ${EXE}_SRCS
-	src/quadpong.h
 	src/main.c
+	src/quadpong.h
+    src/vec2.h
+	src/game_time.h
+	src/util.h
+	src/util.c
+	src/sprite.h
+	src/sprite.c
+	src/sprite_text.h
+	src/sprite_text.c
+	src/object.h
+	src/object.c
 	src/ball.h
 	src/ball.c
 	src/player.h
 	src/player.c
-	src/sprite.h
-	src/sprite.c
 	src/scene.h
 	src/scene.c
 	src/game_scene.h
 	src/game_scene.c
 	src/menu_scene.h
 	src/menu_scene.c
-	src/util.h
-	src/util.c
-	src/game_time.h
-    src/vec2.h
 )
 
 IF(FLATCC_FOUND)
@@ -49,6 +53,8 @@ IF(FLATCC_FOUND)
         ${${EXE}_FBS}
     )
 ENDIF()
+
+SOURCE_GROUP("src" FILES ${${EXE}_SRCS} ${${EXE}_flatcc_OUTPUTS})
 
 ADD_EXECUTABLE(
     ${EXE}
@@ -66,7 +72,8 @@ IF(FLATCC_FOUND)
     TARGET_LINK_LIBRARIES(${EXE} ${FLATCC_RUNTIME_LIBRARY})
 ENDIF()
 
-IF(WIN32)
+IF(MSVC)
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:MSVCRT")
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 	TARGET_LINK_LIBRARIES(${EXE} WS2_32)
 ENDIF()

@@ -4,14 +4,11 @@
 #include "quadpong.h"
 #include "scene.h"
 #include "sprite.h"
+#include "sprite_text.h"
 #include <packet_reader.h>
 #include <packet_builder.h>
 
 #define GAME_START_DELAY 3000
-
-struct player;
-struct ball;
-struct sprite_text;
 
 typedef enum game_state
 {

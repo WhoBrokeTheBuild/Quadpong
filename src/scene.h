@@ -2,19 +2,17 @@
 #define QUADPONG_SCENE_H
 
 #include "quadpong.h"
-#include "game_time.h"
-#include "vec2.h"
 
 typedef struct scene
 {
-    void (*start)(struct scene *);
-    void (*stop)(struct scene *);
+    void (*start)(scene_t *);
+    void (*stop)(scene_t *);
 
-    void (*cleanup)(struct scene *);
-    void (*update)(struct scene *, SDL_Event *, game_time_t *);
-    void (*render)(struct scene *);
+    void (*cleanup)(scene_t *);
+    void (*update)(scene_t *, SDL_Event *, game_time_t *);
+    void (*render)(scene_t *);
 
-    struct scene * prev;
+    struct scene_t * prev;
 }
 scene_t;
 
