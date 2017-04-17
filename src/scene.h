@@ -12,7 +12,7 @@ typedef struct scene
     void (*update)(scene_t *, SDL_Event *, game_time_t *);
     void (*render)(scene_t *);
 
-    struct scene_t * prev;
+    scene_t * prev;
 }
 scene_t;
 

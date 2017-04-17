@@ -30,11 +30,11 @@ void player_init(player_t * ply, area_t area, SDL_Color color);
 void player_cleanup_cb(player_t * ply);
 void player_render_cb(player_t * ply);
 
-inline color_t player_get_color(player_t * player) { return object_get_color(&player->base); }
-inline void player_set_color(player_t * player, color_t color) { object_set_color(&player->base, color); }
+static inline color_t player_get_color(player_t * player) { return object_get_color(&player->base); }
+static inline void player_set_color(player_t * player, color_t color) { object_set_color(&player->base, color); }
 
-inline vec2f_t player_get_vel(player_t * player) { return object_get_vel(&player->base); }
-inline void player_set_vel(player_t * player, vec2f_t vel) { object_set_vel(&player->base, vel); }
+static inline vec2f_t player_get_vel(player_t * player) { return object_get_vel(&player->base); }
+static inline void player_set_vel(player_t * player, vec2f_t vel) { object_set_vel(&player->base, vel); }
 
 static inline vec2f_t player_get_pos(player_t * ply) { return object_get_pos(&ply->base); }
 static inline void player_set_pos(player_t * ply, vec2f_t pos) { object_set_pos(&ply->base, pos); }

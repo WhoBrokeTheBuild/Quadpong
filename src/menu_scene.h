@@ -5,26 +5,24 @@
 #include "scene.h"
 #include "sprite_text.h"
 
-struct menu_scene;
-
 #define MENU_OPTION_HEIGHT 50
+
+typedef struct menu_option menu_option_t;
 
 typedef struct menu_option
 {
-    struct menu_option * parent;
+    menu_option_t * parent;
 
     sprite_text_t sprite;
-    void (*selected)(struct menu_scene *);
+    void (*selected)(menu_scene_t *);
 
     int num_options;
-    struct menu_option * options;
+    menu_option_t * options;
 }
 menu_option_t;
 
-void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2f_t pos);
-menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(struct menu_scene *), vec2f_t pos);
-
-struct game_scene;
+void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2f_t pos);
+menu_option_t * menu_option_add_sub_option(menu_option_t * opt, const char * text, void (*selected)(menu_scene_t *), vec2f_t pos);
 
 typedef struct menu_scene
 {

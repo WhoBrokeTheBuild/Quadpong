@@ -7,14 +7,14 @@ void ball_init(ball_t * ball)
 	object_t * obj = &ball->base;
 	object_init(obj);
 
-	sprite_create(object_get_sprite(obj), 1, 1, (color_t) { 255, 255, 255 });
+	sprite_create(object_get_sprite(obj), 1, 1, (color_t) { 255, 255, 255, 255 });
 	sprite_set_size(object_get_sprite(obj), (vec2_t) { BALL_SIZE, BALL_SIZE });
 
     ball->_last_hit = -1;
 
     float angle = (float)RAD(rand() % 360);
 	ball_set_vel(ball, (vec2f_t) {
-		cosf(angle) * BALL_SPEED, 
+		cosf(angle) * BALL_SPEED,
 		sinf(angle) * BALL_SPEED });
 
 	ball_set_pos(ball, (vec2f_t) {
@@ -33,7 +33,7 @@ void ball_update(ball_t * ball, struct player ** players, game_time_t * gt)
 	object_t * obj = &ball->base;
 
 	vec2f_t vel = ball_get_vel(ball);
-    vec2f_t tpos = vec2f_add(ball_get_pos(ball), 
+    vec2f_t tpos = vec2f_add(ball_get_pos(ball),
 							 vec2f_muls(vel, gt->delta));
 
     for (int i = 0; i < MAX_PLAYERS; ++i)

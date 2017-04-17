@@ -14,9 +14,9 @@ void player_init(player_t * ply, area_t area, SDL_Color color)
 	sprite_t * spr = object_get_sprite(obj);
 	vec2f_t pos;
 
-	sprite_create(spr, 1, 1, (color_t) { 255, 255, 255 });
+	sprite_create(spr, 1, 1, (color_t) { 255, 255, 255, 255 });
 	sprite_set_align(spr, ALIGN_CENTER);
-	
+
 	if (AREA_LEFT == ply->_area)
 	{
 		pos = (vec2f_t) { WALL_PADDING + (PLAYER_V_WIDTH / 2),
@@ -75,7 +75,7 @@ void local_player_init(local_player_t * ply, area_t area, SDL_Color color, SDL_K
 void local_player_update_cb(player_t * ply, SDL_Event * ev, game_time_t * gt)
 {
 	local_player_t * lply = (local_player_t *)ply;
-	
+
 	vec2f_t vel = player_get_vel(ply);
 
 	vec2f_t mod = { 0.0f, 0.0f };

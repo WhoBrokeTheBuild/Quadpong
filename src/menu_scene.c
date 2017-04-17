@@ -7,7 +7,7 @@ void menu_option_init(menu_option_t * opt, const char * text, void (*selected)(m
     assert(NULL != opt);
 
     opt->parent = NULL;
-    
+
     sprite_text_init(&opt->sprite, g_fnt_large, text);
 	sprite_text_set_color(&opt->sprite, (color_t) { 255, 255, 255, 255 });
     sprite_text_set_pos(&opt->sprite, pos);
@@ -105,7 +105,7 @@ void menu_scene_init(menu_scene_t * mscn)
     sprite_load_file(&mscn->title, TITLE_ASSET_PATH);
     sprite_set_pos(&mscn->title, (vec2f_t) { 50, 50 });
 
-	sprite_create(&mscn->arrow, 1, 1, (color_t) { 255, 255, 255 });
+	sprite_create(&mscn->arrow, 1, 1, (color_t) { 255, 255, 255, 255 });
     sprite_set_size(&mscn->arrow, (vec2_t) { 20, 20 });
 
     menu_option_t * menu_ptr;
@@ -125,7 +125,7 @@ void menu_scene_init(menu_scene_t * mscn)
 
     menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Connect to Game", &option_connect_game_cb, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
-    
+
     menu_ptr = menu_option_add_sub_option(&mscn->root_option_group, "Options", NULL, root_mpos);
     root_mpos.y += MENU_OPTION_HEIGHT;
 
@@ -258,4 +258,3 @@ void menu_scene_render_cb(scene_t * scn)
         }
     }
 }
-

@@ -21,7 +21,7 @@
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 
-#else 
+#else
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -31,6 +31,8 @@ typedef SSIZE_T ssize_t;
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#define _strdup strdup
+
 #endif // WIN32
 
 #include <SDL.h>
@@ -39,8 +41,6 @@ typedef SSIZE_T ssize_t;
 
 typedef SDL_Rect  rect_t;
 typedef SDL_Color color_t;
-
-typedef enum align align_t;
 
 typedef struct vec2       vec2_t;
 typedef struct vec2f      vec2f_t;
